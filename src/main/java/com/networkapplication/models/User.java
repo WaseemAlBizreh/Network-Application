@@ -1,31 +1,39 @@
 package com.networkapplication.models;
 
 import jakarta.persistence.*;
-import jdk.jfr.Enabled;
+
+import java.util.List;
 
 @Entity
-@Table
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "username_unique",
+                        columnNames = "username"
+                )
+        }
+)
 public class User {
 
     @Id
     @SequenceGenerator(
-            name = "userid_sequence",
-            sequenceName = "userid_sequence",
+            name = "user_id_sequence",
+            sequenceName = "user_id_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
-            generator = "userid_sequence",
+            generator = "user_id_sequence",
             strategy = GenerationType.SEQUENCE
 
     )
     @Column(
-            name = "id",
+            name = "user_id",
             updatable = false
     )
     private Long id;
     @Column(
             name = "username",
-            unique = true,
             nullable = false,
             columnDefinition = "TEXT"
     )
@@ -38,12 +46,29 @@ public class User {
     )
     private String password;
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
+    @OneToMany(mappedBy = "admin")
+    private List<Group> userGroups;
+
+    @ManyToMany(
+            mappedBy = "members"
+    )
+
+    private List<Group> groups;
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
     public User() {
+    }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
     public Long getId() {
@@ -70,12 +95,11 @@ public class User {
         this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+    public List<Group> getUserGroups() {
+        return userGroups;
+    }
+
+    public void setUserGroups(List<Group> userGroups) {
+        this.userGroups = userGroups;
     }
 }
