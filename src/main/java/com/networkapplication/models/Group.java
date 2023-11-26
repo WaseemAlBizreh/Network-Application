@@ -51,4 +51,7 @@ public class Group {
             )
     )
     private List<User> members;
+    //file
+    @OneToMany(mappedBy = "groupFiles")
+    private List<File> file;
 }

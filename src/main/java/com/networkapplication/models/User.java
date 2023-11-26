@@ -52,4 +52,14 @@ public class User {
     )
 
     private List<Group> groups;
+
+    @OneToMany(mappedBy = "ownerFile")
+    private List<File> files;
+
+
+    @OneToMany(mappedBy = "checkin")
+    private List<File> myFiles;
+
+
+
 }

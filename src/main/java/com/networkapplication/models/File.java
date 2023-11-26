@@ -36,4 +36,25 @@ public class File {
 
     @Lob
     private byte[] content;
+    @ManyToOne
+    @JoinColumn(
+            name = "group_file_id",
+            foreignKey = @ForeignKey(name = "group_file_id_fk")
+    )
+    private Group groupFiles;
+
+    @ManyToOne
+    @JoinColumn(
+            name = "owner_file_id",
+            foreignKey = @ForeignKey(name = "owner_file_id")
+    )
+    private User ownerFile;
+
+    @ManyToOne
+    @JoinColumn(
+            name = "checkin_id",
+            foreignKey = @ForeignKey(name = "checkin_id")
+    )
+    private User checkin;
+
 }
