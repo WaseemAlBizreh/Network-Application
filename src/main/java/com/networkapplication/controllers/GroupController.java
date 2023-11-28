@@ -1,8 +1,8 @@
-package com.saria.Project.controller;
+package com.networkapplication.controllers;
 
-import com.saria.Project.DTO.Response.Message;
-import com.saria.Project.DTO.Response.User;
-import com.saria.Project.services.Services;
+import com.networkapplication.dtos.Request.UserRequest;
+import com.networkapplication.dtos.Response.Message;
+import com.networkapplication.services.Group.GroupServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/group")
 public class GroupController {
-    private Services services;
+    private GroupServices services;
 
     @Autowired
-    public GroupController(Services services) {
+    public GroupController(GroupServices services) {
         this.services = services;
     }
 
     @PostMapping("/addGroup")
-    public ResponseEntity addGroup(@RequestBody User user) {
+    public ResponseEntity addGroup(@RequestBody UserRequest user) {
         return services.addGroup();
     }
 
@@ -28,7 +28,7 @@ public class GroupController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity addUser(@RequestBody User user) {
+    public ResponseEntity addUser(@RequestBody UserRequest user) {
         return services.addUser();
     }
 
@@ -37,7 +37,7 @@ public class GroupController {
         return  services.deleteUser(id);
     }
     @PostMapping("/userJoinToGroup")
-    public ResponseEntity userJoinToGroup(@RequestBody User user) {
+    public ResponseEntity userJoinToGroup(@RequestBody UserRequest user) {
         return services.userJoinToGroup();
     }
 
