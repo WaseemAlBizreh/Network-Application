@@ -2,7 +2,9 @@ package com.networkapplication.services;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,19 +13,11 @@ import com.networkapplication.models.File;
 import com.networkapplication.repositories.FileRepository;
 
 @Service
-public class FileServiceImp {
+@RequiredArgsConstructor
+public class FileServiceImp implements FileService{
 
-    @Autowired
+
     private FileRepository fileDBRepository;
-
-    public File store(MultipartFile file) throws IOException {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        File File = new File();
-        File.setFileName(fileName);
-        File.setContent(file.getBytes());
-
-        return fileDBRepository.save(File);
-    }
 
     public File getFile(Long id) {
         return fileDBRepository.findById(id).get();
@@ -31,5 +25,15 @@ public class FileServiceImp {
 
     public Stream<File> getAllFiles() {
         return fileDBRepository.findAll().stream();
+    }
+
+    @Override
+    public ResponseEntity addFile() {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity getFile() {
+        return null;
     }
 }

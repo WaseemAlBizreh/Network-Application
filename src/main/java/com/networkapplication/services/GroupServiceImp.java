@@ -1,11 +1,13 @@
 package com.networkapplication.services;
 
 import com.networkapplication.NetworkApplication;
+import com.networkapplication.dtos.Response.Message;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,7 +15,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class GroupServiceImp {
+public class GroupServiceImp implements GroupService
+{
 
     private final UserRepository userRepository ;
     private final GroupRepository groupRepository;
@@ -38,6 +41,31 @@ public class GroupServiceImp {
         groupRepository.save(group);
         return new NetworkApplication.GroupCreateResponse("user.toString()",200);
 
+    }
+
+    @Override
+    public ResponseEntity addGroup() {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Message> deleteGroup(Long id) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity addUser() {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Message> deleteUser(int id) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity userJoinToGroup() {
+        return null;
     }
 }
 

@@ -2,6 +2,7 @@ package com.networkapplication.services;
 
 import com.networkapplication.repositories.GroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.networkapplication.NetworkApplication;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImp {
+public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository ;
     private final GroupRepository groupRepository;
@@ -44,6 +45,12 @@ public class UserServiceImp {
 
 
         return new NetworkApplication.UserResponse("logged in",200);
-    }}
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        return null;
+    }
+}
 
 
