@@ -15,10 +15,10 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
-    private UserRepository userRepository;
-    private JwtService jwtService;
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDTOResponse login(UserDTORequest user) {
