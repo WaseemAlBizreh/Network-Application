@@ -2,20 +2,16 @@ package com.networkapplication.controllers;
 
 import com.networkapplication.dtos.Request.UserRequest;
 import com.networkapplication.dtos.Response.Message;
-import com.networkapplication.services.Group.GroupServices;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.networkapplication.services.GroupService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/group")
+@RequiredArgsConstructor
 public class GroupController {
-    private GroupServices services;
-
-    @Autowired
-    public GroupController(GroupServices services) {
-        this.services = services;
-    }
+    private GroupService services;
 
     @PostMapping("/addGroup")
     public ResponseEntity addGroup(@RequestBody UserRequest user) {
@@ -23,7 +19,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/deleteGroup/{groupId}")
-    public ResponseEntity<Message> deleteGroup(@PathVariable int id) {
+    public ResponseEntity<Message> deleteGroup(@PathVariable Long id) {
         return services.deleteGroup(id);
     }
 
@@ -40,7 +36,4 @@ public class GroupController {
     public ResponseEntity userJoinToGroup(@RequestBody UserRequest user) {
         return services.userJoinToGroup();
     }
-
-
-
 }

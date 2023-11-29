@@ -1,9 +1,8 @@
-package com.networkapplication.services.File;
+package com.networkapplication.services;
 
 import org.springframework.http.ResponseEntity;
 
-public interface File {
+public interface FileService {
      ResponseEntity addFile() ;
-
      ResponseEntity getFile() ;
 }

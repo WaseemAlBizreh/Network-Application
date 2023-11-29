@@ -26,7 +26,6 @@ import java.util.List;
         }
 )
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue
     @Column(
