@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -29,13 +30,14 @@ public class File {
     private String fileName;
 
     @Column(
-           name = "last_edit_date",
-           columnDefinition = "DATE"
-   )
+            name = "last_edit_date",
+            columnDefinition = "DATE"
+    )
     private LocalDate lastEditDate;
 
     @Lob
     private byte[] content;
+
     @ManyToOne
     @JoinColumn(
             name = "group_file_id",
