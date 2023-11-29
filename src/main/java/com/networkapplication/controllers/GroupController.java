@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
+
 @RestController
 @RequestMapping("api/group")
 @RequiredArgsConstructor
 public class GroupController {
-    private GroupService services;
+    private final GroupService services;
 
     @PostMapping("/addGroup")
     public ResponseEntity<GroupDTOResponse> addGroup(@RequestBody GroupDTORequest request) {
@@ -22,7 +24,11 @@ public class GroupController {
 
     @DeleteMapping("/deleteGroup/{groupId}")
     public ResponseEntity<MessageDTO> deleteGroup(@PathVariable Long groupId) {
-        return ResponseEntity.ok(services.deleteGroup(groupId));
+        try {
+            return ResponseEntity.ok(services.deleteGroup(groupId));
+        } catch (AuthenticationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping("/addUser")

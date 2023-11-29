@@ -24,9 +24,9 @@ public class AuthController {
         return ResponseEntity.ok(services.register(user));
     }
 
-    @DeleteMapping("/logout")
-    public ResponseEntity<MessageDTO> logout(@RequestHeader String token) {
-        return ResponseEntity.ok(services.logout(token));
-    }
+//    @DeleteMapping("/logout")
+//    public ResponseEntity<MessageDTO> logout(@RequestHeader String token) {
+//        return ResponseEntity.ok(services.logout(token));
+//    }
 
 }

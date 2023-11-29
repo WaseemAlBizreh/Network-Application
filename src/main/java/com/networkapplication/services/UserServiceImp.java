@@ -12,6 +12,7 @@ import com.networkapplication.NetworkApplication;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.UserRepository;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -50,7 +51,8 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        return null;
+        return userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("No User Found"));
     }
 }
 

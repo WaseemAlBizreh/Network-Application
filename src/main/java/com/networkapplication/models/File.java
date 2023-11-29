@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -59,5 +60,7 @@ public class File {
             foreignKey = @ForeignKey(name = "checkin_id")
     )
     private User checkin;
+    @OneToMany(mappedBy = "file")
+    private List<Auditing> logs;
 
 }

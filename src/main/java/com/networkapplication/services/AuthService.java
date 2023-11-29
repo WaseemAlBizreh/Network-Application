@@ -9,5 +9,4 @@ public interface AuthService {
 
     UserDTOResponse register(UserDTORequest userRequest);
 
-    MessageDTO logout(String token);
 }

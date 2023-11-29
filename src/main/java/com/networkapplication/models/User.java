@@ -67,6 +67,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "checkin")
     private List<File> myFiles;
 
+    @OneToMany(mappedBy = "user")
+    private List<Auditing> logs;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
