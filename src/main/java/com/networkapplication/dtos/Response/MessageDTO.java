@@ -1,6 +1,5 @@
 package com.networkapplication.dtos.Response;
 
-import com.networkapplication.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse {
-    private User user;
-    private String token;
+public class MessageDTO {
+    private String message;
 }

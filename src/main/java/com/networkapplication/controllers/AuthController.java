@@ -1,8 +1,8 @@
 package com.networkapplication.controllers;
 
-import com.networkapplication.dtos.Request.UserRequest;
-import com.networkapplication.dtos.Response.Message;
-import com.networkapplication.dtos.Response.UserResponse;
+import com.networkapplication.dtos.Request.UserDTORequest;
+import com.networkapplication.dtos.Response.MessageDTO;
+import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +15,18 @@ public class AuthController {
     private AuthService services;
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody UserRequest user) {
-        return services.login(user);
+    public ResponseEntity<UserDTOResponse> login(@RequestBody UserDTORequest user) {
+        return ResponseEntity.ok(services.login(user));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody UserRequest user) {
-        return services.register(user);
+    public ResponseEntity<UserDTOResponse> register(@RequestBody UserDTORequest user) {
+        return ResponseEntity.ok(services.register(user));
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<Message> logout(@RequestHeader String token) {
-        return services.logout(token);
+    public ResponseEntity<MessageDTO> logout(@RequestHeader String token) {
+        return ResponseEntity.ok(services.logout(token));
     }
 
 }

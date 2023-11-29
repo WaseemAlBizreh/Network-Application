@@ -18,6 +18,7 @@ public class File {
 
     @Id
     @GeneratedValue
+    @SequenceGenerator(name = "files_seq", allocationSize = 1)
     @Column(
             name = "file_id",
             updatable = false

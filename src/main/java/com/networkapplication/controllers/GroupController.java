@@ -1,7 +1,9 @@
 package com.networkapplication.controllers;
 
-import com.networkapplication.dtos.Request.UserRequest;
-import com.networkapplication.dtos.Response.Message;
+import com.networkapplication.dtos.Request.GroupDTORequest;
+import com.networkapplication.dtos.Request.UserDTORequest;
+import com.networkapplication.dtos.Response.GroupDTOResponse;
+import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.services.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,26 +16,26 @@ public class GroupController {
     private GroupService services;
 
     @PostMapping("/addGroup")
-    public ResponseEntity addGroup(@RequestBody UserRequest user) {
-        return services.addGroup();
+    public ResponseEntity<GroupDTOResponse> addGroup(@RequestBody GroupDTORequest request) {
+        return ResponseEntity.ok(services.addGroup(request));
     }
 
     @DeleteMapping("/deleteGroup/{groupId}")
-    public ResponseEntity<Message> deleteGroup(@PathVariable Long id) {
-        return services.deleteGroup(id);
+    public ResponseEntity<MessageDTO> deleteGroup(@PathVariable Long groupId) {
+        return ResponseEntity.ok(services.deleteGroup(groupId));
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity addUser(@RequestBody UserRequest user) {
-        return services.addUser();
+    public ResponseEntity addUser(@RequestBody UserDTORequest user) {
+        return ResponseEntity.ok(services.addUser(user));
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<Message> deleteUser (@PathVariable int id) {
-        return  services.deleteUser(id);
+    public ResponseEntity<MessageDTO> deleteUser (@PathVariable Long userId) {
+        return ResponseEntity.ok(services.deleteUser(userId));
     }
     @PostMapping("/userJoinToGroup")
-    public ResponseEntity userJoinToGroup(@RequestBody UserRequest user) {
-        return services.userJoinToGroup();
+    public ResponseEntity userJoinToGroup(@RequestBody UserDTORequest user) {
+        return ResponseEntity.ok(services.userJoinToGroup());
     }
 }

@@ -1,8 +1,11 @@
 package com.networkapplication.services;
 
+import com.networkapplication.dtos.Request.UserDTORequest;
+import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.repositories.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.networkapplication.NetworkApplication;
@@ -33,18 +36,16 @@ public class UserServiceImp implements UserService {
 }
 
 
-    public NetworkApplication.UserResponse login(NetworkApplication.UserRequest request) {
-        Optional<User> user=userRepository.findUserByUsername(request.username());
+    public UserDTOResponse login(UserDTORequest request) {
+        Optional<User> user = userRepository.findUserByUsername(request.getUserName());
         if (!user.isPresent()){
-            throw new IllegalStateException("username is not exist");
+            throw new UsernameNotFoundException("User not found");
         }
         User user1=user.get();
-        if (!user1.getPassword().equals(request.password())){
+        if (!user1.getPassword().equals(request.getPassword())){
             throw new IllegalStateException("wrong password");
         }
-
-
-        return new NetworkApplication.UserResponse("logged in",200);
+        return UserDTOResponse.builder().user(user1).build();
     }
 
     @Override

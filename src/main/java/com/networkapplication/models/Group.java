@@ -13,11 +13,20 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "groups")
+@Table(
+        name = "groups",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "group_name_unique",
+                        columnNames = "group_name"
+                )
+        }
+)
 public class Group {
 
     @Id
     @GeneratedValue
+    @SequenceGenerator(name = "groups_seq", allocationSize = 1)
     @Column(
             name = "group_id",
             updatable = false

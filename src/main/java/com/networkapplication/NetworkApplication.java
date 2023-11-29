@@ -20,8 +20,6 @@ public record FileRequest(){}
 
 	public record UserResponse1(String message, int status_code , User user){}
 	public record UserRequest(String username,String password){}
-	public record GroupCreateRequest(String username,String password ,String groupName){}
-	public record GroupCreateResponse(String message, int status_code){}
 public record FileResponse(String message, int status_code ,File file){}
 
 }

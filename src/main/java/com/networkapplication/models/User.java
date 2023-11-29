@@ -29,6 +29,7 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue
+    @SequenceGenerator(name = "user_seq", allocationSize = 1)
     @Column(
             name = "user_id",
             updatable = false
@@ -48,15 +49,17 @@ public class User implements UserDetails {
     )
     private String password;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "admin")
     private List<Group> userGroups;
 
+    @JsonIgnore
     @ManyToMany(
             mappedBy = "members"
     )
 
     private List<Group> groups;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "ownerFile")
     private List<File> files;
 

@@ -1,16 +1,18 @@
 package com.networkapplication.services;
 
-import com.networkapplication.dtos.Response.Message;
-import org.springframework.http.ResponseEntity;
+import com.networkapplication.dtos.Request.GroupDTORequest;
+import com.networkapplication.dtos.Request.UserDTORequest;
+import com.networkapplication.dtos.Response.GroupDTOResponse;
+import com.networkapplication.dtos.Response.MessageDTO;
 
 public interface GroupService {
-    ResponseEntity addGroup();
+    GroupDTOResponse addGroup(GroupDTORequest request);
 
-    ResponseEntity<Message> deleteGroup(Long id);
+    MessageDTO deleteGroup(Long id);
 
-    ResponseEntity addUser();
+    MessageDTO addUser(UserDTORequest request);
 
-    ResponseEntity<Message> deleteUser(int id);
+    MessageDTO deleteUser(Long id);
 
-    ResponseEntity userJoinToGroup();
+    MessageDTO userJoinToGroup();
 }
