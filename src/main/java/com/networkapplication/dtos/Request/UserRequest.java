@@ -1,4 +1,4 @@
-package com.saria.Project.DTO.Request;
+package com.networkapplication.dtos.Request;
 
 public class UserRequest {
     private String userName;

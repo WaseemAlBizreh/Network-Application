@@ -1,7 +1,7 @@
-package com.saria.Project.controller;
+package com.networkapplication.controllers;
 
-import com.saria.Project.DTO.Response.User;
-import com.saria.Project.services.Services;
+import com.networkapplication.dtos.Request.UserRequest;
+import com.networkapplication.services.File.FileServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,20 +10,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/file")
 public class FileController {
 
-    private Services services;
+    private FileServices services;
 
     @Autowired
-    public FileController(Services services) {
+    public FileController(FileServices services) {
         this.services = services;
     }
 
     @PostMapping("/addFile")
-    public ResponseEntity addFile(@RequestBody User user){
+    public ResponseEntity addFile(@RequestBody UserRequest user){
         return services.addFile();
     }
 
     @GetMapping("/getFile")
-    public ResponseEntity getFile(@RequestBody User user) {
+    public ResponseEntity getFile(@RequestBody UserRequest user) {
         return services.getFile();
     }
 

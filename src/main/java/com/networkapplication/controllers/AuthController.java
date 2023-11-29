@@ -1,10 +1,9 @@
-package com.saria.Project.controller;
+package com.networkapplication.controllers;
 
-import com.saria.Project.DTO.Response.Message;
-import com.saria.Project.DTO.Request.UserRequest;
-import com.saria.Project.DTO.Response.User;
-import com.saria.Project.services.AuthServices;
-
+import com.networkapplication.dtos.Request.UserRequest;
+import com.networkapplication.dtos.Response.Message;
+import com.networkapplication.dtos.Response.UserResponse;
+import com.networkapplication.services.Auth.AuthServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody UserRequest user) {
+    public ResponseEntity<UserResponse> login(@RequestBody UserRequest user) {
 
         return services.login(user);
     }

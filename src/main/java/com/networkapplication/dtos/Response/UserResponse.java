@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Message {
-    private String message;
+public class UserResponse {
+    private String userName;
+    private String token;
+    private String id;
 }
