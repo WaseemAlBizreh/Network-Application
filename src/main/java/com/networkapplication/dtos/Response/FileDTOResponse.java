@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileDTOResponse {
-    private String fileName;
+    private Long file_id;
+    private String file_name;
     private String path;
-    private Long group_id;
-    private Long owner_id;
-    private Long checkin_id;
+    private String message;
 }

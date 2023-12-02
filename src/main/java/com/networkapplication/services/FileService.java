@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
+import java.util.List;
 
 public interface FileService {
-     MessageDTO fileUpload(FileDTORequest request);
-     FileDTOResponse loadFile(Long id) throws AuthenticationException;
+     FileDTOResponse fileUpload(FileDTORequest request);
+     FileDTOResponse loadFile(Long id);
+     List loadAllGroupFiles(Long groupId);
 }
