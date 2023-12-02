@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -100,11 +101,26 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    public FileDTOResponse loadFile(Long fileId) {
+    public FileDTOResponse loadFile(Long fileId) throws  javax.naming.AuthenticationException {
         //Get FileName From DB
-        String fileName = "fileName";
+       File file= fileRepository.findById(fileId)
+                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        //Get User
+        String header = Request.getHeader("Authorization");
+        String token = header.substring(7);
+        User user = userRepository.findUserByUsername(jwtService.extractUsername(token))
+                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        //get group
+        Group group =file.getGroupFiles();
+        List<User> members=group.getMembers();
+        if (!members.contains(user)){
+            throw new javax.naming.AuthenticationException("you are not a member of this file's group");
+        }
+
+
 
         //Get File Form Server
+        String fileName = file.getFileName();
         Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
         Path fileLocation = uploadPath.resolve(fileName);
         return null;

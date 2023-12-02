@@ -6,9 +6,10 @@ import com.networkapplication.dtos.Response.MessageDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 
+import javax.naming.AuthenticationException;
 import java.io.IOException;
 
 public interface FileService {
      MessageDTO fileUpload(FileDTORequest request);
-     FileDTOResponse loadFile(Long id) ;
+     FileDTOResponse loadFile(Long id) throws AuthenticationException;
 }
