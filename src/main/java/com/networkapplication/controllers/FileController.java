@@ -2,6 +2,7 @@ package com.networkapplication.controllers;
 
 import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Request.UserDTORequest;
+import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.services.FileService;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,8 @@ public class FileController {
     }
 
 
-    @GetMapping("/getFile")
-    public ResponseEntity getFile(@RequestBody UserDTORequest user) {
-        return services.getFile();
+    @GetMapping("/load/{file_id}")
+    public ResponseEntity<FileDTOResponse> loadFile(@PathVariable Long file_id) {
+        return ResponseEntity.ok(services.loadFile(file_id));
     }
-
-
 }

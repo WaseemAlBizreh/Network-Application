@@ -37,7 +37,9 @@ public class File {
     )
     private LocalDate lastEditDate;
 
-
+    @Column(
+            name = "file_path"
+    )
     private String path;
 
     @ManyToOne
@@ -60,6 +62,7 @@ public class File {
             foreignKey = @ForeignKey(name = "checkin_id")
     )
     private User checkin;
+
     @OneToMany(mappedBy = "file")
     private List<Auditing> logs;
 
