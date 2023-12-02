@@ -1,6 +1,8 @@
 package com.networkapplication.controllers;
 
+import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Request.UserDTORequest;
+import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.services.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +16,8 @@ public class FileController {
     private FileService services;
 
     @PostMapping("/addFile")
-    public ResponseEntity addFile(@RequestBody UserDTORequest user){
-        return services.addFile();
+    public MessageDTO addFile(@RequestBody FileDTORequest file){
+        return services.addFile(file);
     }
 
     @GetMapping("/getFile")
