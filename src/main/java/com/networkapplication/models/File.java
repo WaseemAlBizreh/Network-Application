@@ -37,8 +37,8 @@ public class File {
     )
     private LocalDate lastEditDate;
 
-    @Lob
-    private byte[] content;
+
+    private String path;
 
     @ManyToOne
     @JoinColumn(
