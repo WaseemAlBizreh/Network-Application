@@ -7,7 +7,9 @@ import com.networkapplication.models.File;
 import java.util.List;
 
 public interface FileService {
-     FileDTOResponse fileUpload(FileDTORequest request);
-     FileDTOResponse loadFile(Long id);
-     List<File> loadAllGroupFiles(Long groupId);
+    FileDTOResponse fileUpload(FileDTORequest request);
+
+    FileDTOResponse loadFile(Long id);
+
+    List<File> loadAllGroupFiles(Long groupId);
 }

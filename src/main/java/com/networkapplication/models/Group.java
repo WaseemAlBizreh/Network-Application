@@ -51,7 +51,7 @@ public class Group {
     @JoinTable(
             name = "user_group",
             joinColumns = @JoinColumn(
-                    name ="group_id",
+                    name = "group_id",
                     foreignKey = @ForeignKey(name = "group_id_fk")
             ),
             inverseJoinColumns = @JoinColumn(

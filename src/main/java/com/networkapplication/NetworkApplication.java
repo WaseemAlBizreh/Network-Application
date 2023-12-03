@@ -11,15 +11,26 @@ import java.util.List;
 @SpringBootApplication
 public class NetworkApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NetworkApplication.class, args);
-	}
-public record FileRecord(List<File>files){}
-public record FileRequest(){}
-	public record UserResponse(String message, int status_code ){}
+    public static void main(String[] args) {
+        SpringApplication.run(NetworkApplication.class, args);
+    }
 
-	public record UserResponse1(String message, int status_code , User user){}
-	public record UserRequest(String username,String password){}
-public record FileResponse(String message, int status_code ,File file){}
+    public record FileRecord(List<File> files) {
+    }
+
+    public record FileRequest() {
+    }
+
+    public record UserResponse(String message, int status_code) {
+    }
+
+    public record UserResponse1(String message, int status_code, User user) {
+    }
+
+    public record UserRequest(String username, String password) {
+    }
+
+    public record FileResponse(String message, int status_code, File file) {
+    }
 
 }

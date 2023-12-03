@@ -38,9 +38,10 @@ public class GroupController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<MessageDTO> deleteUser (@PathVariable Long userId) {
+    public ResponseEntity<MessageDTO> deleteUser(@PathVariable Long userId) {
         return ResponseEntity.ok(services.deleteUser(userId));
     }
+
     @PostMapping("/userJoinToGroup")
     public ResponseEntity userJoinToGroup(@RequestBody UserDTORequest user) {
         return ResponseEntity.ok(services.userJoinToGroup());

@@ -14,7 +14,6 @@ public class UserServiceImp implements UserService {
     private final UserRepository userRepository;
 
 
-
     @Override
     public UserDetails loadUserByUsername(String username) {
         return userRepository.findUserByUsername(username)

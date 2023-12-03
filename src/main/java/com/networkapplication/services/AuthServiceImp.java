@@ -1,11 +1,11 @@
 package com.networkapplication.services;
 
+import com.networkapplication.config.JwtService;
 import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.UserRepository;
-import com.networkapplication.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;

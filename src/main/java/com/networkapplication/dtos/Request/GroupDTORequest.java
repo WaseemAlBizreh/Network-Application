@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupDTORequest {
-        private String groupName;
+    private String groupName;
     private Long userId;
 }
 
