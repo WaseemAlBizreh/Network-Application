@@ -22,7 +22,7 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public UserDTOResponse login(UserDTORequest request) {
-        Optional<User> user = userRepository.findUserByUsername(request.getUserName());
+        Optional<User> user = userRepository.findUserByUsername(request.getUsername());
         if (!user.isPresent()) {
             throw new IllegalStateException("username is not exist");
         }
@@ -43,12 +43,12 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public UserDTOResponse register(UserDTORequest userRequest) {
-        if (!userRequest.getConfirmPassword().equals(userRequest.getPassword())) {
+        if (!userRequest.getConfirm_password().equals(userRequest.getPassword())) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(422),
                     "Password and Confirm Password Don't Match");
         }
         User user = User.builder()
-                .username(userRequest.getUserName())
+                .username(userRequest.getUsername())
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .build();
         userRepository.save(user);

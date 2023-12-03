@@ -14,10 +14,11 @@ import com.networkapplication.repositories.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,14 +33,18 @@ public class FileServiceImp implements FileService {
     @Value("${file.upload-dir}")
     private String uploadDir;
     @NonNull
-    HttpServletRequest Request;
-    UserRepository userRepository;
-    GroupRepository groupRepository;
-    FileRepository fileRepository;
+    private final HttpServletRequest Request;
+    private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final FileRepository fileRepository;
     private final JwtService jwtService;
 
     @Override
-    public MessageDTO fileUpload(FileDTORequest request) {
+    public FileDTOResponse fileUpload(FileDTORequest request) {
+        String fileName;
+        Path targetLocation;
+        File file;
+
         //Get User
         String header = Request.getHeader("Authorization");
         String token = header.substring(7);
@@ -53,76 +58,101 @@ public class FileServiceImp implements FileService {
         //Save File to Server
         try {
             if (request.getFile().isEmpty()) {
-                throw new StorageException("Failed to store empty file.");
+                throw new ResponseStatusException(HttpStatusCode.valueOf(500),
+                        "Failed to store empty file.");
             }
             Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
 
-            String fileName = request.getFile().getOriginalFilename();
+            fileName = request.getFile().getOriginalFilename();
 
             if (fileName == null) {
-                throw new IOException("File Name doesn't Exist");
+                throw new ResponseStatusException(HttpStatusCode.valueOf(404),
+                        "File Name doesn't Exist");
             }
 
-            Path targetLocation = uploadPath.resolve(fileName);
+            targetLocation = uploadPath.resolve(fileName);
             Files.copy(request.getFile().getInputStream(),
                     targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             // Set File Record to DB
-            File file = new File();
-            file.setFileName(fileName);
-            file.setGroupFiles(group);
-            file.setOwnerFile(user);
+            file = File.builder()
+                    .fileName(fileName)
+                    .ownerFile(user)
+                    .groupFiles(group)
+                    .build();
             if (group.getFile() != null) {
-                List<File> files = group.getFile();
-                files.add(file);
-                group.setFile(files);
+                group.getFile().add(file);
             } else {
                 group.setFile(List.of(file));
             }
             if (user.getFiles() != null) {
-                List<File> files = user.getFiles();
-                files.add(file);
-                user.setFiles(files);
+                user.getFiles().add(file);
             } else {
                 user.setFiles(List.of(file));
             }
             userRepository.save(user);
             groupRepository.save(group);
             fileRepository.save(file);
-        } catch (IOException | StorageException e) {
-            return MessageDTO.builder()
-                    .message(e.getMessage())
-                    .build();
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(500),
+                    e.getMessage());
         }
-        return MessageDTO.builder()
-                .message("File Upload Successfully")
+        //TODO: not this path
+        return FileDTOResponse.builder()
+                .file_id(file.getId())
+                .file_name(fileName)
+                .path(targetLocation.toAbsolutePath().toString())
+                .message("File Uploaded Successfully")
                 .build();
     }
 
     @Override
-    public FileDTOResponse loadFile(Long fileId) throws  javax.naming.AuthenticationException {
+    public FileDTOResponse loadFile(Long fileId) {
         //Get FileName From DB
-       File file= fileRepository.findById(fileId)
+        File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new NoSuchElementException("No User Found"));
+
         //Get User
         String header = Request.getHeader("Authorization");
         String token = header.substring(7);
         User user = userRepository.findUserByUsername(jwtService.extractUsername(token))
                 .orElseThrow(() -> new NoSuchElementException("No User Found"));
-        //get group
-        Group group =file.getGroupFiles();
-        List<User> members=group.getMembers();
-        if (!members.contains(user)){
-            throw new javax.naming.AuthenticationException("you are not a member of this file's group");
+
+        //Get Group
+        //Check if User is a member in filesGroup
+        Group group = file.getGroupFiles();
+        List<User> members = group.getMembers();
+        if (!members.contains(user)) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(403),
+                    "You are not a member of this file's group");
         }
-
-
 
         //Get File Form Server
         String fileName = file.getFileName();
         Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
-        Path fileLocation = uploadPath.resolve(fileName);
-        return null;
+        Path filePath = uploadPath.resolve(fileName);
+        Resource resource = new org.springframework.core.io.PathResource(filePath);
+        if (resource.exists()) {
+            try {
+                return FileDTOResponse.builder()
+                        .file_id(fileId)
+                        .file_name(fileName)
+                        .path(resource.getURI().getPath())
+                        .message("Success")
+                        .build();
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatusCode.valueOf(500),
+                        "File Not Found");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(404),
+                    "File Not Found");
+        }
+    }
+
+    @Override
+    public List loadAllGroupFiles(Long groupId) {
+        return List.of();
     }
 }

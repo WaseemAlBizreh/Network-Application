@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTORequest {
-    private String userName;
+    private String username;
     private String password;
-    private String confirmPassword;
+    private String confirm_password;
 }

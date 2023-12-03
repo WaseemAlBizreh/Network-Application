@@ -38,7 +38,7 @@ public class UserServiceImp implements UserService {
 
 
     public UserDTOResponse login(UserDTORequest request) {
-        Optional<User> user = userRepository.findUserByUsername(request.getUserName());
+        Optional<User> user = userRepository.findUserByUsername(request.getUsername());
         if (!user.isPresent()) {
             throw new UsernameNotFoundException("User not found");
         }
