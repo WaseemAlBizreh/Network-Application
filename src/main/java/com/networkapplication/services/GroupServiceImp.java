@@ -1,6 +1,6 @@
 package com.networkapplication.services;
 
-import com.networkapplication.config.JwtService;
+import com.networkapplication.security.JwtService;
 import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.GroupDTOResponse;
@@ -11,16 +11,13 @@ import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,10 +1,8 @@
 package com.networkapplication.services;
 
-import com.networkapplication.config.JwtService;
+import com.networkapplication.security.JwtService;
 import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
-import com.networkapplication.dtos.Response.MessageDTO;
-import com.networkapplication.exceptions.StorageException;
 import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;

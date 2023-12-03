@@ -1,7 +1,6 @@
 package com.networkapplication.controllers;
 
 import com.networkapplication.dtos.Request.UserDTORequest;
-import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.services.AuthService;
 import lombok.RequiredArgsConstructor;

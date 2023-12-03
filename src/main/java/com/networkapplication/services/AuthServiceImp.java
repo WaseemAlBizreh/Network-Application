@@ -1,10 +1,11 @@
 package com.networkapplication.services;
 
-import com.networkapplication.config.JwtService;
 import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.UserDTOResponse;
+import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.UserRepository;
+import com.networkapplication.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,12 +24,11 @@ public class AuthServiceImp implements AuthService {
     @Override
     public UserDTOResponse login(UserDTORequest request) {
         Optional<User> user = userRepository.findUserByUsername(request.getUsername());
-        if (!user.isPresent()) {
-            throw new IllegalStateException("username is not exist");
+        if (user.isEmpty()) {
+            throw new ResponseException(404, "username is not exist");
         }
         User user1 = user.get();
         if (!passwordEncoder.matches(request.getPassword(), user1.getPassword())) {
-
             throw new IllegalStateException("wrong password");
         }
 
@@ -57,6 +57,4 @@ public class AuthServiceImp implements AuthService {
                 .token(jwtService.generateToken(user))
                 .build();
     }
-
-
 }
