@@ -8,13 +8,12 @@ import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
+import com.networkapplication.repositories.Search;
 import com.networkapplication.repositories.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,12 +29,10 @@ import java.util.NoSuchElementException;
 public class FileServiceImp implements FileService {
     @Value("${file.upload-dir}")
     private String uploadDir;
-    @NonNull
-    private final HttpServletRequest Request;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final FileRepository fileRepository;
-    private final JwtService jwtService;
+    private final Search search;
 
     @Override
     public FileDTOResponse fileUpload(FileDTORequest request) {
@@ -44,10 +41,7 @@ public class FileServiceImp implements FileService {
         File file;
 
         //Get User
-        String header = Request.getHeader("Authorization");
-        String token = header.substring(7);
-        User user = userRepository.findUserByUsername(jwtService.extractUsername(token))
-                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        User user =search.getCurrentUser();
 
         //Get Group
         Group group = groupRepository.findById(request.getGroup_id())
@@ -112,10 +106,7 @@ public class FileServiceImp implements FileService {
                 .orElseThrow(() -> new NoSuchElementException("No User Found"));
 
         //Get User
-        String header = Request.getHeader("Authorization");
-        String token = header.substring(7);
-        User user = userRepository.findUserByUsername(jwtService.extractUsername(token))
-                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        User user =search.getCurrentUser();
 
         //Get Group
         //Check if User is a member in filesGroup
@@ -150,7 +141,7 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    public List loadAllGroupFiles(Long groupId) {
-        return List.of();
+    public List<File> loadAllGroupFiles(Long groupId) {
+        return null;
     }
 }

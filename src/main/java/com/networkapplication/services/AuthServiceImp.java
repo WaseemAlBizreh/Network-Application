@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,16 +29,19 @@ public class AuthServiceImp implements AuthService {
         }
         User user1 = user.get();
         if (!passwordEncoder.matches(request.getPassword(), user1.getPassword())) {
+        User user=userRepository.findUserByUsername(request.getUsername())
+                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+
             throw new IllegalStateException("wrong password");
         }
 
         // Generate a JWT token
-        String token = jwtService.generateToken(user1);
-
-        return UserDTOResponse.builder()
-                .user(user1)
-                .token(token)
-                .build();
+        String token = jwtService.generateToken(user);
+        UserDTOResponse response=new UserDTOResponse(user);
+        response.setToken(token);
+        return response;
     }
 
     @Override
@@ -52,9 +55,8 @@ public class AuthServiceImp implements AuthService {
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .build();
         userRepository.save(user);
-        return UserDTOResponse.builder()
-                .user(user)
-                .token(jwtService.generateToken(user))
-                .build();
+        UserDTOResponse response=new UserDTOResponse(user);
+        response.setToken(jwtService.generateToken(user));
+        return response;
     }
 }

@@ -1,38 +1,34 @@
 package com.networkapplication.services;
 
-import com.networkapplication.security.JwtService;
+import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.GroupDTORequest;
-import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.GroupDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.GroupRepository;
+import com.networkapplication.repositories.Search;
 import com.networkapplication.repositories.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.naming.AuthenticationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImp implements GroupService {
-    private final JwtService jwtService;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
-    @NonNull HttpServletRequest Request;
+    private final Search search;
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) {
-        String header= Request.getHeader("Authorization");
-        String token=header.substring(7);
-
-        User user = userRepository.findUserByUsername(jwtService.extractUsername(token))
-                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        User user =search.getCurrentUser();
         Group group = new Group();
         group.setGroupName(request.getGroupName());
         List<User> members = new ArrayList<>();
@@ -53,10 +49,7 @@ public class GroupServiceImp implements GroupService {
 
     @Override
     public MessageDTO deleteGroup(Long id) throws AuthenticationException {
-        String header= Request.getHeader("Authorization");
-        String token=header.substring(7);
-        User user = userRepository.findUserByUsername(jwtService.extractUsername(token))
-                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        User user =search.getCurrentUser();
         Group group=groupRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No group Found"));
        if (group.getAdmin().getId().equals(user.getId())){
@@ -69,8 +62,29 @@ public class GroupServiceImp implements GroupService {
     }
 
     @Override
-    public MessageDTO addUser(UserDTORequest request) {
-        return null;
+    public MessageDTO addUser(AddUserToGroupRequest request) {
+
+        User user =search.getCurrentUser();
+        Group group=groupRepository.findById(request.getGroup_id())
+                .orElseThrow(() -> new NoSuchElementException("No group Found"));
+        if(!group.getAdmin().getId().equals(user.getId())){
+            throw new ResponseStatusException(HttpStatusCode.valueOf(403),
+                    "you are not the admin of this group");
+        }
+        User newUser=userRepository.findById(request.getUser_id())
+                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        if (group.getMembers().contains(newUser)){
+            throw new ResponseStatusException(HttpStatusCode.valueOf(500),
+                    "this user is already a member in  this group");
+        }
+        if (newUser.getGroups()!=null){
+            newUser.getGroups().add(group);
+        }
+        else newUser.setGroups(List.of(group));
+        group.getMembers().add(newUser);
+        groupRepository.save(group);
+        userRepository.save(newUser);
+        return MessageDTO.builder().message("user added successfully").build();
     }
 
     @Override

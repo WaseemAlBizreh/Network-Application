@@ -1,5 +1,6 @@
 package com.networkapplication.controllers;
 
+import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.GroupDTOResponse;
@@ -32,8 +33,8 @@ public class GroupController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity addUser(@RequestBody UserDTORequest user) {
-        return ResponseEntity.ok(services.addUser(user));
+    public ResponseEntity addUser(@RequestBody AddUserToGroupRequest request) {
+        return ResponseEntity.ok(services.addUser(request));
     }
 
     @DeleteMapping("/deleteUser/{userId}")
