@@ -49,17 +49,17 @@ public class User implements UserDetails {
     )
     private String password;
 
-    @JsonIgnore
+
     @OneToMany(mappedBy = "admin")
     private List<Group> userGroups;
 
-    @JsonIgnore
+
     @ManyToMany(
             mappedBy = "members"
     )
 
     private List<Group> groups;
-    @JsonIgnore
+
     @OneToMany(mappedBy = "ownerFile")
     private List<File> files;
 

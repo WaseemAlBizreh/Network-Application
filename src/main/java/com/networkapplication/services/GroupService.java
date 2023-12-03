@@ -9,12 +9,8 @@ import javax.naming.AuthenticationException;
 
 public interface GroupService {
     GroupDTOResponse addGroup(GroupDTORequest request);
-
     MessageDTO deleteGroup(Long id) throws AuthenticationException;
-
     MessageDTO addUser(AddUserToGroupRequest request);
-
     MessageDTO deleteUser(Long id);
-
-    MessageDTO userJoinToGroup();
+    MessageDTO leaveGroup(Long group_id);
 }

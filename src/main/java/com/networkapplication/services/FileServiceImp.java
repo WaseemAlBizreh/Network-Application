@@ -140,6 +140,11 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
+    public void deleteAllInGroup(Long group_id) {
+
+    }
+
+    @Override
     public List<File> loadAllGroupFiles(Long groupId) {
         return null;
     }

@@ -92,9 +92,27 @@ public class GroupServiceImp implements GroupService {
     }
 
     @Override
-    public MessageDTO userJoinToGroup() {
-        return null;
+    public MessageDTO leaveGroup(Long group_id) {
+        //get user
+        User user = search.getCurrentUser();
+        //get group
+        Group group = groupRepository.findById(group_id)
+                .orElseThrow(() -> new NoSuchElementException("no group found"));
+        if (group.getAdmin().getId() == user.getId())
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400),
+                    "admin can't leave the group");
+        if (!group.getMembers().contains(user))
+            throw new ResponseStatusException(HttpStatusCode.valueOf(403),
+                    "you are not a member in this group");
+        group.getMembers().remove(user);
+        user.getGroups().remove(group);
+        userRepository.save(user);
+        groupRepository.save(group);
+        return MessageDTO.builder().message("user left the group successfully").build();
+
     }
+
+
 }
 
 
