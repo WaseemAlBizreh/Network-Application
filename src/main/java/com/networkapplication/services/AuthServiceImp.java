@@ -23,15 +23,8 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public UserDTOResponse login(UserDTORequest request) {
-        Optional<User> user = userRepository.findUserByUsername(request.getUsername());
-        if (user.isEmpty()) {
-            throw new ResponseException(404, "username is not exist");
-        }
-        User user1 = user.get();
-        if (!passwordEncoder.matches(request.getPassword(), user1.getPassword())) {
-        User user=userRepository.findUserByUsername(request.getUsername())
-                .orElseThrow(() -> new NoSuchElementException("No User Found"));
-
+        User user = userRepository.findUserByUsername(request.getUsername())
+                .orElseThrow(() -> new ResponseException(404, "User Not Found"));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 
             throw new IllegalStateException("wrong password");
@@ -39,7 +32,7 @@ public class AuthServiceImp implements AuthService {
 
         // Generate a JWT token
         String token = jwtService.generateToken(user);
-        UserDTOResponse response=new UserDTOResponse(user);
+        UserDTOResponse response = new UserDTOResponse(user);
         response.setToken(token);
         return response;
     }
@@ -55,7 +48,7 @@ public class AuthServiceImp implements AuthService {
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .build();
         userRepository.save(user);
-        UserDTOResponse response=new UserDTOResponse(user);
+        UserDTOResponse response = new UserDTOResponse(user);
         response.setToken(jwtService.generateToken(user));
         return response;
     }

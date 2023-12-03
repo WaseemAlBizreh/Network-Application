@@ -1,8 +1,8 @@
 package com.networkapplication.services;
 
-import com.networkapplication.security.JwtService;
 import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
+import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
@@ -41,17 +41,16 @@ public class FileServiceImp implements FileService {
         File file;
 
         //Get User
-        User user =search.getCurrentUser();
+        User user = search.getCurrentUser();
 
         //Get Group
         Group group = groupRepository.findById(request.getGroup_id())
-                .orElseThrow(() -> new NoSuchElementException("No group Found"));
+                .orElseThrow(() -> new ResponseException(404, "Group not found"));
 
         //Save File to Server
         try {
             if (request.getFile().isEmpty()) {
-                throw new ResponseStatusException(HttpStatusCode.valueOf(500),
-                        "Failed to store empty file.");
+                throw new ResponseException(500, "Failed to store empty file.");
             }
             Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
@@ -106,7 +105,7 @@ public class FileServiceImp implements FileService {
                 .orElseThrow(() -> new NoSuchElementException("No User Found"));
 
         //Get User
-        User user =search.getCurrentUser();
+        User user = search.getCurrentUser();
 
         //Get Group
         //Check if User is a member in filesGroup
