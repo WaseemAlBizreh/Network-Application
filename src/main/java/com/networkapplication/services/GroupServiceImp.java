@@ -73,7 +73,16 @@ public class GroupServiceImp implements GroupService {
 
     @Override
     public MessageDTO addUser(UserDTORequest request) {
-        return null;
+        String header= Request.getHeader("Authorization");
+        String token=header.substring(7);
+        User user = userRepository.findUserByUsername(jwtService.extractUsername(token))
+                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+        Group group=groupRepository.findById(group_id)
+                .orElseThrow(() -> new NoSuchElementException("No group Found"));
+        if(!group.getAdmin().getId().equals(user.getId())){
+
+        }
+
     }
 
     @Override
