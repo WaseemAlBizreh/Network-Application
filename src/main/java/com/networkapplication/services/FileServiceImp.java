@@ -2,6 +2,8 @@ package com.networkapplication.services;
 
 import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
+import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
+import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -139,12 +142,25 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    public void deleteAllInGroup(Long group_id) {
-
+    public MessageDTO deleteAllInGroup(Long group_id) {
+        Group group=groupRepository.findById(group_id).orElseThrow(
+                ()->new  NoSuchElementException("No Group Found")
+        );
+        List<File>files=group.getFile();
+        fileRepository.deleteAll(files);
+        return MessageDTO.builder().message("Delete All Files").build();
     }
 
     @Override
-    public List<File> loadAllGroupFiles(Long groupId) {
-        return null;
+    public List<GroupFilesDTOResponse> loadAllGroupFiles(Long groupId) {
+        Group group=groupRepository.findById(groupId).orElseThrow(
+                ()-> new ResponseException(404, "Group not found"));
+        List<GroupFilesDTOResponse> filesDTOGroupResponses = new ArrayList<>();
+        for (File file :
+                group.getFile()) {
+            filesDTOGroupResponses.add(new GroupFilesDTOResponse(file));
+        }
+
+        return filesDTOGroupResponses;
     }
 }
