@@ -1,5 +1,6 @@
 package com.networkapplication.dtos.Response;
 
+import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTOResponse {
+public class UserDTOResponse implements MainDTO {
     private Long user_id;
     private String user_name;
     private List<String> user_groups;

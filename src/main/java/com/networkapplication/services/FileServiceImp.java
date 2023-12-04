@@ -44,12 +44,12 @@ public class FileServiceImp implements FileService {
 
         //Get Group
         Group group = groupRepository.findById(request.getGroup_id())
-                .orElseThrow(() -> new ResponseException(404, "Group not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
         //Save File to Server
         try {
             if (request.getFile().isEmpty()) {
-                throw new ResponseException(500, "Failed to store empty file.");
+                throw new IllegalArgumentException("Failed to store empty file.");
             }
             Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
