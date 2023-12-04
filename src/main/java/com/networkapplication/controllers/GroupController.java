@@ -17,7 +17,6 @@ import javax.naming.AuthenticationException;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService services;
-
     @PostMapping("/addGroup")
     public ResponseEntity<GroupDTOResponse> addGroup(@RequestBody GroupDTORequest request) {
         return ResponseEntity.ok(services.addGroup(request));

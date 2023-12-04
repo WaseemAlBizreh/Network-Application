@@ -4,6 +4,7 @@ import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.dtos.Response.GroupDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
+import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.GroupRepository;
@@ -42,7 +43,7 @@ public class GroupServiceImp implements GroupService {
         return GroupDTOResponse.builder()
                 .group_id(group.getId())
                 .group_name(group.getGroupName())
-                .admin(user)
+                .admin(new UserDTOResponse(user))
                 .build();
     }
 
