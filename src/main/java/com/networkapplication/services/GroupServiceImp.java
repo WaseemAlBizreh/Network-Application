@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import javax.naming.AuthenticationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,8 +107,6 @@ public class GroupServiceImp implements GroupService {
             return MessageDTO.builder().message("User Deleted Successfully").build();
         } else
             return MessageDTO.builder().message("User Not Found").build();
-
-
     }
 
     @Override
@@ -128,7 +127,6 @@ public class GroupServiceImp implements GroupService {
         userRepository.save(user);
         groupRepository.save(group);
         return MessageDTO.builder().message("user left the group successfully").build();
-
     }
 
     @Override
@@ -141,7 +139,6 @@ public class GroupServiceImp implements GroupService {
         }
         return userDTOGroups;
     }
-
 
 
 }

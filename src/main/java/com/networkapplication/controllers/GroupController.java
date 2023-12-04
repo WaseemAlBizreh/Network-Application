@@ -39,16 +39,12 @@ public class GroupController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<MessageDTO> deleteUser(@RequestBody DeleteDTOUser request) {
+    public ResponseEntity<MainDTO> deleteUser(@RequestBody DeleteDTOUser request) {
         return ResponseEntity.ok(services.deleteUser(request));
     }
 
     @DeleteMapping("/leaveGroup/{groupId}")
-    public ResponseEntity<MessageDTO> leaveGroup(@PathVariable Long groupId) {
+    public ResponseEntity<MainDTO> leaveGroup(@PathVariable Long groupId) {
         return ResponseEntity.ok(services.leaveGroup(groupId));
-
-    public ResponseEntity<MainDTO> deleteUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(services.deleteUser(userId));
     }
-    
 }
