@@ -1,6 +1,8 @@
 package com.networkapplication.dtos.Response;
 
 
+import com.networkapplication.dtos.MainDTO;
+import com.networkapplication.dtos.UserDTO;
 import com.networkapplication.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupDTOResponse {
+public class GroupDTOResponse implements MainDTO {
     private String group_name;
     private Long group_id;
-    private User admin;
+    private UserDTO admin;
 }

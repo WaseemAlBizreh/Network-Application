@@ -1,10 +1,9 @@
 package com.networkapplication.controllers;
 
+import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.GroupDTORequest;
-import com.networkapplication.dtos.Request.UserDTORequest;
-import com.networkapplication.dtos.Response.GroupDTOResponse;
-import com.networkapplication.dtos.Response.MessageDTO;
+import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.services.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +16,15 @@ import javax.naming.AuthenticationException;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService services;
+    private final GlobalExceptionHandler exceptionHandler;
 
     @PostMapping("/addGroup")
-    public ResponseEntity<GroupDTOResponse> addGroup(@RequestBody GroupDTORequest request) {
+    public ResponseEntity<MainDTO> addGroup(@RequestBody GroupDTORequest request) {
         return ResponseEntity.ok(services.addGroup(request));
     }
 
     @DeleteMapping("/deleteGroup/{groupId}")
-    public ResponseEntity<MessageDTO> deleteGroup(@PathVariable Long groupId) {
+    public ResponseEntity<MainDTO> deleteGroup(@PathVariable Long groupId) {
         try {
             return ResponseEntity.ok(services.deleteGroup(groupId));
         } catch (AuthenticationException e) {
@@ -33,13 +33,12 @@ public class GroupController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity addUser(@RequestBody AddUserToGroupRequest request) {
+    public ResponseEntity<MainDTO> addUser(@RequestBody AddUserToGroupRequest request) {
         return ResponseEntity.ok(services.addUser(request));
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<MessageDTO> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<MainDTO> deleteUser(@PathVariable Long userId) {
         return ResponseEntity.ok(services.deleteUser(userId));
     }
-    
 }

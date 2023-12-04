@@ -12,6 +12,7 @@ import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,6 +39,8 @@ public class FileServiceImp implements FileService {
         String fileName;
         Path targetLocation;
         File file;
+        Resource urlResource;
+        String contentType;
 
         //Get User
         User user = utils.getCurrentUser();
@@ -60,11 +63,15 @@ public class FileServiceImp implements FileService {
                 throw new ResponseStatusException(HttpStatusCode.valueOf(404),
                         "File Name doesn't Exist");
             }
-//todo: check file exist
+            fileName = fileName.replaceAll(" ", "_");
+
+            //todo: check file exist
+
             targetLocation = uploadPath.resolve(fileName);
             Files.copy(request.getFile().getInputStream(),
                     targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
+            urlResource = new UrlResource(targetLocation.toUri());
             // Set File Record to DB
             file = File.builder()
                     .fileName(fileName)
@@ -92,7 +99,7 @@ public class FileServiceImp implements FileService {
         return FileDTOResponse.builder()
                 .file_id(file.getId())
                 .file_name(fileName)
-                .path(targetLocation.toAbsolutePath().toString())
+                .path(urlResource)
                 .message("File Uploaded Successfully")
                 .build();
     }
@@ -121,17 +128,12 @@ public class FileServiceImp implements FileService {
         Path filePath = uploadPath.resolve(fileName);
         Resource resource = new org.springframework.core.io.PathResource(filePath);
         if (resource.exists()) {
-            try {
-                return FileDTOResponse.builder()
-                        .file_id(fileId)
-                        .file_name(fileName)
-                        .path(resource.getURI().getPath())
-                        .message("Success")
-                        .build();
-            } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatusCode.valueOf(500),
-                        "File Not Found");
-            }
+            return FileDTOResponse.builder()
+                    .file_id(fileId)
+                    .file_name(fileName)
+                    .path(resource)
+                    .message("Success")
+                    .build();
         } else {
             throw new ResponseStatusException(HttpStatusCode.valueOf(404),
                     "File Not Found");

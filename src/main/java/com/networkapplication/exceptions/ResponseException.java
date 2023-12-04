@@ -1,7 +1,5 @@
 package com.networkapplication.exceptions;
 
-import javax.naming.AuthenticationException;
-
 public class ResponseException extends Exception {
     private int statusCode;
 
