@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,12 +21,12 @@ public class AuthServiceImp implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDTOResponse login(UserDTORequest request) {
+    public UserDTOResponse login(UserDTORequest request) throws ResponseException {
         User user = userRepository.findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseException(404, "User Not Found"));
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 
-            throw new IllegalStateException("wrong password");
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new ResponseException(422, "Wrong Password");
         }
 
         // Generate a JWT token

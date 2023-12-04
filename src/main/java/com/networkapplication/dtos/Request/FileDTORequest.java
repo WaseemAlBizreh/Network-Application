@@ -1,5 +1,6 @@
 package com.networkapplication.dtos.Request;
 
+import com.networkapplication.dtos.MainDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDTORequest {
+public class FileDTORequest implements MainDTO {
     Long group_id;
     MultipartFile file;
 }
