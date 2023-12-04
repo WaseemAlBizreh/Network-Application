@@ -21,7 +21,6 @@ public class Utils {
     public User getCurrentUser() {
         String header = Request.getHeader("Authorization");
         String token = header.substring(7);
-
         return userRepository.findUserByUsername(jwtService.extractUsername(token))
                 .orElseThrow(() -> new NoSuchElementException("No User Found"));
     }

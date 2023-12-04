@@ -2,6 +2,7 @@ package com.networkapplication.controllers;
 
 import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.Request.AddUserToGroupRequest;
+import com.networkapplication.dtos.Request.DeleteDTOUser;
 import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.services.GroupService;
@@ -38,7 +39,16 @@ public class GroupController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
+    public ResponseEntity<MessageDTO> deleteUser(@RequestBody DeleteDTOUser request) {
+        return ResponseEntity.ok(services.deleteUser(request));
+    }
+
+    @DeleteMapping("/leaveGroup/{groupId}")
+    public ResponseEntity<MessageDTO> leaveGroup(@PathVariable Long groupId) {
+        return ResponseEntity.ok(services.leaveGroup(groupId));
+
     public ResponseEntity<MainDTO> deleteUser(@PathVariable Long userId) {
         return ResponseEntity.ok(services.deleteUser(userId));
     }
+    
 }

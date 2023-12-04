@@ -1,9 +1,11 @@
 package com.networkapplication.services;
 
 import com.networkapplication.dtos.Request.AddUserToGroupRequest;
+import com.networkapplication.dtos.Request.DeleteDTOUser;
 import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.dtos.Response.GroupDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
+import com.networkapplication.dtos.Response.UserGroupsDTOResponse;
 import com.networkapplication.dtos.UserDTO;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
@@ -13,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import javax.naming.AuthenticationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +88,26 @@ public class GroupServiceImp implements GroupService {
     }
 
     @Override
-    public MessageDTO deleteUser(Long id) {
-        return null;
+    public MessageDTO deleteUser(DeleteDTOUser request) {
+        //get admin
+        User admin = search.getCurrentUser();
+        //get group
+        Group group = groupRepository.findById(request.getGroupId()).orElseThrow(
+                () -> new NoSuchElementException("No Group Found")
+        );
+        User user = userRepository.findById(request.getUserId()).orElseThrow(
+                () -> new NoSuchElementException("No User Found"));
+        if (group.getMembers().contains(user)) {
+            if (admin.getId().equals(request.getGroupId())) {
+                group.getMembers().remove(user);
+            }
+            groupRepository.save(group);
+            userRepository.save(user);
+            return MessageDTO.builder().message("User Deleted Successfully").build();
+        } else
+            return MessageDTO.builder().message("User Not Found").build();
+
+
     }
 
     @Override
@@ -111,6 +130,18 @@ public class GroupServiceImp implements GroupService {
         return MessageDTO.builder().message("user left the group successfully").build();
 
     }
+
+    @Override
+    public List<UserGroupsDTOResponse> getAllGroup() {
+        User user = search.getCurrentUser();
+        List<UserGroupsDTOResponse> userDTOGroups = new ArrayList<>();
+        for (Group group :
+                user.getGroups()) {
+            userDTOGroups.add(new UserGroupsDTOResponse(group));
+        }
+        return userDTOGroups;
+    }
+
 
 
 }
