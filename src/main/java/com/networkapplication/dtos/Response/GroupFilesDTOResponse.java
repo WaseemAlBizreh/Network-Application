@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupFilesDTOResponse {
-    Long fileId;
-    String fileName;
-    String path;
+    private Long fileId;
+    private String fileName;
+    private String path;
 
     public GroupFilesDTOResponse(File file) {
         fileId=file.getId();

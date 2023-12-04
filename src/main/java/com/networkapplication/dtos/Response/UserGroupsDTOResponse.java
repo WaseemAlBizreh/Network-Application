@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserGroupsDTOResponse {
-    Long groupID;
-    String groupName;
+    private Long groupID;
+    private String groupName;
 
     public UserGroupsDTOResponse(Group group) {
         groupID=group.getId();
