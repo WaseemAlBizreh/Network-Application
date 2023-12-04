@@ -7,7 +7,6 @@ import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.GroupRepository;
-import com.networkapplication.repositories.Search;
 import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -24,7 +23,7 @@ import java.util.NoSuchElementException;
 public class GroupServiceImp implements GroupService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
-    private final Search search;
+    private final Utils search;
 
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) {

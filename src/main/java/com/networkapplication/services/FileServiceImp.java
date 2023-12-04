@@ -8,7 +8,6 @@ import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
-import com.networkapplication.repositories.Search;
 import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +31,7 @@ public class FileServiceImp implements FileService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final FileRepository fileRepository;
-    private final Search search;
+    private final Utils utils;
 
     @Override
     public FileDTOResponse fileUpload(FileDTORequest request) {
@@ -41,7 +40,7 @@ public class FileServiceImp implements FileService {
         File file;
 
         //Get User
-        User user = search.getCurrentUser();
+        User user = utils.getCurrentUser();
 
         //Get Group
         Group group = groupRepository.findById(request.getGroup_id())
@@ -61,7 +60,7 @@ public class FileServiceImp implements FileService {
                 throw new ResponseStatusException(HttpStatusCode.valueOf(404),
                         "File Name doesn't Exist");
             }
-
+//todo: check file exist
             targetLocation = uploadPath.resolve(fileName);
             Files.copy(request.getFile().getInputStream(),
                     targetLocation, StandardCopyOption.REPLACE_EXISTING);
@@ -105,7 +104,7 @@ public class FileServiceImp implements FileService {
                 .orElseThrow(() -> new NoSuchElementException("No User Found"));
 
         //Get User
-        User user = search.getCurrentUser();
+        User user = utils.getCurrentUser();
 
         //Get Group
         //Check if User is a member in filesGroup

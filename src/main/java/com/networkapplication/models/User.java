@@ -57,7 +57,6 @@ public class User implements UserDetails {
     @ManyToMany(
             mappedBy = "members"
     )
-
     private List<Group> groups;
 
     @OneToMany(mappedBy = "ownerFile")

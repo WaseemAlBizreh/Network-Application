@@ -1,17 +1,18 @@
-package com.networkapplication.repositories;
+package com.networkapplication.services;
 
 import com.networkapplication.config.JwtService;
 import com.networkapplication.models.User;
+import com.networkapplication.repositories.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
-@Component
-public class Search {
+@Service
+public class Utils {
     @NonNull
     HttpServletRequest Request;
     private final UserRepository userRepository;
