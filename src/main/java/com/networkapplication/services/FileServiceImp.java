@@ -4,7 +4,6 @@ import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
-import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
@@ -51,7 +50,8 @@ public class FileServiceImp implements FileService {
         //Get Group
         Group group = groupRepository.findById(request.getGroup_id())
                 .orElseThrow(() -> new ResponseException(404,"Group not found"));
-
+        //get file name
+        fileName = request.getFile().getOriginalFilename();
         //Save File to Server
         try {
             if (request.getFile().isEmpty()) {
@@ -59,9 +59,6 @@ public class FileServiceImp implements FileService {
             }
             Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
-
-            fileName = request.getFile().getOriginalFilename();
-
             if (fileName == null) {
                 throw new ResponseException(404,
                         "File Name doesn't Exist");
@@ -151,7 +148,7 @@ public class FileServiceImp implements FileService {
         Group group=groupRepository.findById(group_id).orElseThrow(
                 ()->new  ResponseException(404,"No Group Found")
         );
-        List<File>files=group.getFile();
+        List<File> files = group.getFile();
         fileRepository.deleteAll(files);
         return MessageDTO.builder().message("Delete All Files").build();
     }
