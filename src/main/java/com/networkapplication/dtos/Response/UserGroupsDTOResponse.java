@@ -15,7 +15,7 @@ public class UserGroupsDTOResponse {
     private String groupName;
 
     public UserGroupsDTOResponse(Group group) {
-        groupID=group.getId();
-        groupName=group.getGroupName();
+        groupID = group.getId();
+        groupName = group.getGroupName();
     }
 }

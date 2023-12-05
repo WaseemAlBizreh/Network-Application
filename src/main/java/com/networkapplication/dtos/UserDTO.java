@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO implements MainDTO{
+public class UserDTO implements MainDTO {
     private Long user_id;
     private String user_name;
     private List<String> user_groups;

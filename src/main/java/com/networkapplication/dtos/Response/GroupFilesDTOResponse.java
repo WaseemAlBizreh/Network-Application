@@ -16,8 +16,8 @@ public class GroupFilesDTOResponse {
     private String path;
 
     public GroupFilesDTOResponse(File file) {
-        fileId=file.getId();
-        fileName=file.getFileName();
-        path=file.getPath();
+        fileId = file.getId();
+        fileName = file.getFileName();
+        path = file.getPath();
     }
 }

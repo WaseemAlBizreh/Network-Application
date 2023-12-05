@@ -4,7 +4,6 @@ import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
-import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
@@ -51,7 +50,8 @@ public class FileServiceImp implements FileService {
         //Get Group
         Group group = groupRepository.findById(request.getGroup_id())
                 .orElseThrow(() -> new IllegalArgumentException("Group not found"));
-
+        //get file name
+        fileName = request.getFile().getOriginalFilename();
         //Save File to Server
         try {
             if (request.getFile().isEmpty()) {
@@ -59,9 +59,6 @@ public class FileServiceImp implements FileService {
             }
             Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
-
-            fileName = request.getFile().getOriginalFilename();
-
             if (fileName == null) {
                 throw new ResponseStatusException(HttpStatusCode.valueOf(404),
                         "File Name doesn't Exist");
@@ -145,18 +142,18 @@ public class FileServiceImp implements FileService {
 
     @Override
     public MessageDTO deleteAllInGroup(Long group_id) {
-        Group group=groupRepository.findById(group_id).orElseThrow(
-                ()->new  NoSuchElementException("No Group Found")
+        Group group = groupRepository.findById(group_id).orElseThrow(
+                () -> new NoSuchElementException("No Group Found")
         );
-        List<File>files=group.getFile();
+        List<File> files = group.getFile();
         fileRepository.deleteAll(files);
         return MessageDTO.builder().message("Delete All Files").build();
     }
 
     @Override
     public List<GroupFilesDTOResponse> loadAllGroupFiles(Long groupId) {
-        Group group=groupRepository.findById(groupId).orElseThrow(
-                ()-> new ResponseException(404, "Group not found"));
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new NoSuchElementException("No Group Found"));
         List<GroupFilesDTOResponse> filesDTOGroupResponses = new ArrayList<>();
         for (File file :
                 group.getFile()) {

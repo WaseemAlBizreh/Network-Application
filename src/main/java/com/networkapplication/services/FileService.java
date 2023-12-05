@@ -11,6 +11,8 @@ public interface FileService {
     FileDTOResponse fileUpload(FileDTORequest request);
 
     FileDTOResponse loadFile(Long id);
+
     MessageDTO deleteAllInGroup(Long group_id);
+
     List<GroupFilesDTOResponse> loadAllGroupFiles(Long groupId);
 }
