@@ -6,6 +6,6 @@ import com.networkapplication.exceptions.ResponseException;
 public interface AuthService {
     UserDTOResponse login(UserDTORequest user) throws ResponseException;
 
-    UserDTOResponse register(UserDTORequest userRequest);
+    UserDTOResponse register(UserDTORequest userRequest) throws ResponseException;
 
 }

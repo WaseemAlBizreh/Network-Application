@@ -1,4 +1,5 @@
 package com.networkapplication.dtos;
 
+public interface MainDTO {
 
-public interface MainDTO { }
+}

@@ -5,6 +5,7 @@ import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.DeleteDTOUser;
 import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
+import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.services.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,14 @@ public class GroupController {
 
     @PostMapping("/addGroup")
     public ResponseEntity<MainDTO> addGroup(@RequestBody GroupDTORequest request) {
-        return ResponseEntity.ok(services.addGroup(request));
+        try {
+            return ResponseEntity.ok(services.addGroup(request));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
     }
 
+    // TODO: 12/4/2023 يوجد معالجة للخطأ 
     @DeleteMapping("/deleteGroup/{groupId}")
     public ResponseEntity<MainDTO> deleteGroup(@PathVariable Long groupId) {
         try {
@@ -34,17 +40,38 @@ public class GroupController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity<MainDTO> addUser(@RequestBody AddUserToGroupRequest request) {
-        return ResponseEntity.ok(services.addUser(request));
+    public ResponseEntity<MainDTO> addUser(@RequestBody AddUserToGroupRequest request)  {
+        try {
+            return ResponseEntity.ok(services.addUser(request));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<MainDTO> deleteUser(@RequestBody DeleteDTOUser request) {
-        return ResponseEntity.ok(services.deleteUser(request));
+    public ResponseEntity<MainDTO> deleteUser(@PathVariable Long userId)  {
+        try {
+            return ResponseEntity.ok(services.deleteUser(userId));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
     }
 
     @DeleteMapping("/leaveGroup/{groupId}")
-    public ResponseEntity<MainDTO> leaveGroup(@PathVariable Long groupId) {
-        return ResponseEntity.ok(services.leaveGroup(groupId));
+    public ResponseEntity<MainDTO> leaveGroup(@PathVariable Long groupId)  {
+        try {
+            return ResponseEntity.ok(services.leaveGroup(groupId));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+
+    @GetMapping("/getAllGroups")
+    public ResponseEntity<MainDTO> getAllGroups() {
+        try {
+            return ResponseEntity.ok(services.getAllGroup());
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
     }
 }

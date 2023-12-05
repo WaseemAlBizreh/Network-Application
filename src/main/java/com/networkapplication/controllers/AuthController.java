@@ -29,7 +29,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<MainDTO> register(@RequestBody UserDTORequest user) {
-        return ResponseEntity.ok(services.register(user));
+        try {
+            return ResponseEntity.ok(services.register(user));
+        }
+        catch (ResponseException ex) {
+        return exceptionHandler.handleException(ex);
+        }
+        }
     }
 
 //    @DeleteMapping("/logout")
@@ -37,4 +43,4 @@ public class AuthController {
 //        return ResponseEntity.ok(services.logout(token));
 //    }
 
-}
+

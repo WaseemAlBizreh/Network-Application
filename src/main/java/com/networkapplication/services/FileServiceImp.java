@@ -38,7 +38,7 @@ public class FileServiceImp implements FileService {
     private final Utils utils;
 
     @Override
-    public FileDTOResponse fileUpload(FileDTORequest request) {
+    public FileDTOResponse fileUpload(FileDTORequest request) throws ResponseException {
         String fileName;
         Path targetLocation;
         File file;
@@ -50,12 +50,12 @@ public class FileServiceImp implements FileService {
 
         //Get Group
         Group group = groupRepository.findById(request.getGroup_id())
-                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+                .orElseThrow(() -> new ResponseException(404,"Group not found"));
 
         //Save File to Server
         try {
             if (request.getFile().isEmpty()) {
-                throw new IllegalArgumentException("Failed to store empty file.");
+                throw new ResponseException(404,"Failed to store empty file.");
             }
             Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
@@ -63,7 +63,7 @@ public class FileServiceImp implements FileService {
             fileName = request.getFile().getOriginalFilename();
 
             if (fileName == null) {
-                throw new ResponseStatusException(HttpStatusCode.valueOf(404),
+                throw new ResponseException(404,
                         "File Name doesn't Exist");
             }
             fileName = fileName.replaceAll(" ", "_");
@@ -94,9 +94,12 @@ public class FileServiceImp implements FileService {
             userRepository.save(user);
             groupRepository.save(group);
             fileRepository.save(file);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(500),
-                    e.getMessage());
+            
+        }
+        // TODO: 12/4/2023 Exception because IO 
+        catch (Exception ex) {
+            throw new ResponseException(500,
+                    ex.getMessage());
         }
         //TODO: not this path
         return FileDTOResponse.builder()
@@ -108,10 +111,10 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    public FileDTOResponse loadFile(Long fileId) {
+    public FileDTOResponse loadFile(Long fileId)throws ResponseException {
         //Get FileName From DB
         File file = fileRepository.findById(fileId)
-                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+                .orElseThrow(() -> new ResponseException(404,"No User Found"));
 
         //Get User
         User user = utils.getCurrentUser();
@@ -121,7 +124,7 @@ public class FileServiceImp implements FileService {
         Group group = file.getGroupFiles();
         List<User> members = group.getMembers();
         if (!members.contains(user)) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(403),
+            throw new ResponseException(403,
                     "You are not a member of this file's group");
         }
 
@@ -138,15 +141,15 @@ public class FileServiceImp implements FileService {
                     .message("Success")
                     .build();
         } else {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(404),
+            throw new ResponseException(404,
                     "File Not Found");
         }
     }
 
     @Override
-    public MessageDTO deleteAllInGroup(Long group_id) {
+    public MessageDTO deleteAllInGroup(Long group_id) throws ResponseException{
         Group group=groupRepository.findById(group_id).orElseThrow(
-                ()->new  NoSuchElementException("No Group Found")
+                ()->new  ResponseException(404,"No Group Found")
         );
         List<File>files=group.getFile();
         fileRepository.deleteAll(files);
@@ -154,7 +157,7 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    public List<GroupFilesDTOResponse> loadAllGroupFiles(Long groupId) {
+    public List<GroupFilesDTOResponse> loadAllGroupFiles(Long groupId) throws ResponseException{
         Group group=groupRepository.findById(groupId).orElseThrow(
                 ()-> new ResponseException(404, "Group not found"));
         List<GroupFilesDTOResponse> filesDTOGroupResponses = new ArrayList<>();

@@ -37,9 +37,10 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public UserDTOResponse register(UserDTORequest userRequest) {
+    public UserDTOResponse register(UserDTORequest userRequest) throws ResponseException {
+
         if (!userRequest.getConfirm_password().equals(userRequest.getPassword())) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422),
+            throw new ResponseException(422,
                     "Password and Confirm Password Don't Match");
         }
         User user = User.builder()
@@ -48,6 +49,7 @@ public class AuthServiceImp implements AuthService {
                 .build();
         userRepository.save(user);
         UserDTOResponse response = new UserDTOResponse(user);
+
         response.setToken(jwtService.generateToken(user));
         return response;
     }

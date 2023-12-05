@@ -4,9 +4,11 @@ import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.DeleteDTOUser;
 import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.dtos.Response.GroupDTOResponse;
+import com.networkapplication.dtos.Response.ListUserGroupsDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.dtos.Response.UserGroupsDTOResponse;
 import com.networkapplication.dtos.UserDTO;
+import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.GroupRepository;
@@ -29,7 +31,7 @@ public class GroupServiceImp implements GroupService {
     private final Utils search;
 
     @Override
-    public GroupDTOResponse addGroup(GroupDTORequest request) {
+    public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
         User user = search.getCurrentUser();
         Group group = new Group();
         group.setGroupName(request.getGroupName());
@@ -64,19 +66,19 @@ public class GroupServiceImp implements GroupService {
     }
 
     @Override
-    public MessageDTO addUser(AddUserToGroupRequest request) {
+    public MessageDTO addUser(AddUserToGroupRequest request) throws ResponseException{
 
         User user = search.getCurrentUser();
         Group group = groupRepository.findById(request.getGroup_id())
-                .orElseThrow(() -> new NoSuchElementException("No group Found"));
+                .orElseThrow(() -> new ResponseException(404,"No group Found"));
         if (!group.getAdmin().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(403),
+            throw new ResponseException(403,
                     "you are not the admin of this group");
         }
         User newUser = userRepository.findById(request.getUser_id())
-                .orElseThrow(() -> new NoSuchElementException("No User Found"));
+                .orElseThrow(() -> new ResponseException(404,"No User Found"));
         if (group.getMembers().contains(newUser)) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(500),
+            throw new ResponseException(500,
                     "this user is already a member in  this group");
         }
         if (newUser.getGroups() != null) {
@@ -89,17 +91,20 @@ public class GroupServiceImp implements GroupService {
     }
 
     @Override
-    public MessageDTO deleteUser(DeleteDTOUser request) {
+    public MessageDTO deleteUser(Long id) throws ResponseException {
         //get admin
         User admin = search.getCurrentUser();
         //get group
-        Group group = groupRepository.findById(request.getGroupId()).orElseThrow(
-                () -> new NoSuchElementException("No Group Found")
+        Group group = groupRepository.findById(id).orElseThrow(
+                () -> new ResponseException(404,"No Group Found")
         );
-        User user = userRepository.findById(request.getUserId()).orElseThrow(
-                () -> new NoSuchElementException("No User Found"));
+        if(id.equals(admin.getId())){
+            throw new ResponseException(500,"can't deleted yourself");
+        }
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResponseException(404,"No User Found"));
         if (group.getMembers().contains(user)) {
-            if (admin.getId().equals(request.getGroupId())) {
+            if (admin.getId().equals(id)) {
                 group.getMembers().remove(user);
             }
             groupRepository.save(group);
@@ -110,17 +115,17 @@ public class GroupServiceImp implements GroupService {
     }
 
     @Override
-    public MessageDTO leaveGroup(Long group_id) {
+    public MessageDTO leaveGroup(Long group_id) throws ResponseException{
         //get user
         User user = search.getCurrentUser();
         //get group
         Group group = groupRepository.findById(group_id)
-                .orElseThrow(() -> new NoSuchElementException("no group found"));
+                .orElseThrow(() -> new ResponseException(404,"no group found"));
         if (group.getAdmin().getId() == user.getId())
-            throw new ResponseStatusException(HttpStatusCode.valueOf(400),
+            throw new ResponseException(400,
                     "admin can't leave the group");
         if (!group.getMembers().contains(user))
-            throw new ResponseStatusException(HttpStatusCode.valueOf(403),
+            throw new ResponseException(403,
                     "you are not a member in this group");
         group.getMembers().remove(user);
         user.getGroups().remove(group);
@@ -130,14 +135,16 @@ public class GroupServiceImp implements GroupService {
     }
 
     @Override
-    public List<UserGroupsDTOResponse> getAllGroup() {
+    public ListUserGroupsDTOResponse getAllGroup() throws ResponseException {
         User user = search.getCurrentUser();
         List<UserGroupsDTOResponse> userDTOGroups = new ArrayList<>();
+        ListUserGroupsDTOResponse listUserGroupsDTOResponse=new ListUserGroupsDTOResponse();
         for (Group group :
                 user.getGroups()) {
             userDTOGroups.add(new UserGroupsDTOResponse(group));
+            listUserGroupsDTOResponse.setUserGroupsDTOResponses(userDTOGroups);
         }
-        return userDTOGroups;
+        return listUserGroupsDTOResponse;
     }
 
 
