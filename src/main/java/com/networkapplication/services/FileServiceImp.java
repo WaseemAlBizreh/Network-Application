@@ -4,6 +4,7 @@ import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
+import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
