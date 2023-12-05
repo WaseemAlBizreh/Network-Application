@@ -28,8 +28,13 @@ import java.util.List;
 )
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
-    @SequenceGenerator(name = "user_seq", allocationSize = 1)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_seq"
+    )
+    @SequenceGenerator(name = "user_seq",
+            sequenceName = "user_seq",
+            allocationSize = 1)
     @Column(
             name = "user_id",
             updatable = false
