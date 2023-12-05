@@ -40,7 +40,7 @@ public class GroupController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity<MainDTO> addUser(@RequestBody AddUserToGroupRequest request)  {
+    public ResponseEntity<MainDTO> addUser(@RequestBody AddUserToGroupRequest request) {
         try {
             return ResponseEntity.ok(services.addUser(request));
         } catch (ResponseException ex) {
@@ -49,7 +49,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<MainDTO> deleteUser(@PathVariable Long userId)  {
+    public ResponseEntity<MainDTO> deleteUser(@PathVariable Long userId) {
         try {
             return ResponseEntity.ok(services.deleteUser(userId));
         } catch (ResponseException ex) {
@@ -58,7 +58,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/leaveGroup/{groupId}")
-    public ResponseEntity<MainDTO> leaveGroup(@PathVariable Long groupId)  {
+    public ResponseEntity<MainDTO> leaveGroup(@PathVariable Long groupId) {
         try {
             return ResponseEntity.ok(services.leaveGroup(groupId));
         } catch (ResponseException ex) {

@@ -7,10 +7,8 @@ import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 
 @Service

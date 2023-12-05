@@ -20,10 +20,10 @@ public class FileController {
     private final FileService services;
 
     @PostMapping("/upload")
-    public ResponseEntity<MainDTO> fileUpload(@ModelAttribute FileDTORequest file)  {
+    public ResponseEntity<MainDTO> fileUpload(@ModelAttribute FileDTORequest file) {
         try {
             return ResponseEntity.ok(services.fileUpload(file));
-        }catch (ResponseException ex){
+        } catch (ResponseException ex) {
             return exceptionHandler.handleException(ex);
         }
 
@@ -34,16 +34,16 @@ public class FileController {
     public ResponseEntity<MainDTO> loadFile(@PathVariable Long file_id) {
         try {
             return ResponseEntity.ok(services.loadFile(file_id));
-        }catch (ResponseException ex){
+        } catch (ResponseException ex) {
             return exceptionHandler.handleException(ex);
         }
     }
 
     @DeleteMapping("/deleteAllFiles")
-    public ResponseEntity<MainDTO> deleteAllFiles(@PathVariable Long groupId)  {
+    public ResponseEntity<MainDTO> deleteAllFiles(@PathVariable Long groupId) {
         try {
             return ResponseEntity.ok(services.deleteAllInGroup(groupId));
-        }catch (ResponseException ex){
+        } catch (ResponseException ex) {
             return exceptionHandler.handleException(ex);
         }
     }

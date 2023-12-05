@@ -31,12 +31,11 @@ public class AuthController {
     public ResponseEntity<MainDTO> register(@RequestBody UserDTORequest user) {
         try {
             return ResponseEntity.ok(services.register(user));
-        }
-        catch (ResponseException ex) {
-        return exceptionHandler.handleException(ex);
-        }
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
         }
     }
+}
 
 //    @DeleteMapping("/logout")
 //    public ResponseEntity<MessageDTO> logout(@RequestHeader String token) {
