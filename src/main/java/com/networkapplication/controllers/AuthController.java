@@ -2,14 +2,15 @@ package com.networkapplication.controllers;
 
 import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.Request.UserDTORequest;
-import com.networkapplication.dtos.Response.UserDTOResponse;
-import com.networkapplication.exceptions.ErrorDTO;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("api/auth")
@@ -36,7 +37,10 @@ public class AuthController {
         return exceptionHandler.handleException(ex);
         }
         }
-    }
+
+
+}
+
 
 //    @DeleteMapping("/logout")
 //    public ResponseEntity<MessageDTO> logout(@RequestHeader String token) {

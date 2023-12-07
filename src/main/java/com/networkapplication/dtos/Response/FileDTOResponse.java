@@ -15,6 +15,6 @@ import org.springframework.core.io.Resource;
 public class FileDTOResponse implements MainDTO {
     private Long file_id;
     private String file_name;
-    private Resource path;
+    private String path;
     private String message;
 }

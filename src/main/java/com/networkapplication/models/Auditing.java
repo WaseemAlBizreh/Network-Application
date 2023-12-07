@@ -16,8 +16,13 @@ import java.time.LocalDate;
 public class Auditing {
 
     @Id
-    @GeneratedValue
-    @SequenceGenerator(name = "auditing_sec", allocationSize = 1)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "auditing_seq"
+    )
+    @SequenceGenerator(name = "auditing_seq",
+            sequenceName = "auditing_seq",
+            allocationSize = 1)
     private Long id;
 
     private LocalDate date;

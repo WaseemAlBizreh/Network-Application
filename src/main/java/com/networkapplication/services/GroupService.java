@@ -18,11 +18,11 @@ import javax.naming.AuthenticationException;
 public interface GroupService {
     GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException;
 
-    MessageDTO deleteGroup(Long id) throws AuthenticationException;
+    MessageDTO deleteGroup(Long id) throws ResponseException;
 
     MessageDTO addUser(AddUserToGroupRequest request) throws ResponseException;
 
-    MessageDTO deleteUser(Long id) throws ResponseException;
+    MessageDTO deleteUser(DeleteDTOUser deleteDTOUser) throws ResponseException;
 
     MessageDTO leaveGroup(Long group_id) throws ResponseException;
 

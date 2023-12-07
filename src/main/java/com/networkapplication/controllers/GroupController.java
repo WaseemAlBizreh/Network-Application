@@ -34,8 +34,8 @@ public class GroupController {
     public ResponseEntity<MainDTO> deleteGroup(@PathVariable Long groupId) {
         try {
             return ResponseEntity.ok(services.deleteGroup(groupId));
-        } catch (AuthenticationException e) {
-            throw new RuntimeException(e);
+        } catch (ResponseException e) {
+            return exceptionHandler.handleException(e);
         }
     }
 
@@ -48,10 +48,10 @@ public class GroupController {
         }
     }
 
-    @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<MainDTO> deleteUser(@PathVariable Long userId)  {
+    @DeleteMapping("/deleteUser")
+    public ResponseEntity<MainDTO> deleteUser(@RequestBody DeleteDTOUser deleteDTOUser)  {
         try {
-            return ResponseEntity.ok(services.deleteUser(userId));
+            return ResponseEntity.ok(services.deleteUser(deleteDTOUser));
         } catch (ResponseException ex) {
             return exceptionHandler.handleException(ex);
         }

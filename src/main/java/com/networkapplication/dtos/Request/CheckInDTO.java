@@ -5,14 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDTORequest implements MainDTO {
-    Long group_id;
-    String file_name;
-    MultipartFile file;
+public class CheckInDTO implements MainDTO {
+   private Long file_id;
+   private Long user_id;
 }

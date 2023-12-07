@@ -1,7 +1,6 @@
 package com.networkapplication;
 
 import com.networkapplication.models.File;
-import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +8,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.List;
 
 @SpringBootApplication
+
 public class NetworkApplication {
+
 
     public static void main(String[] args) {
         SpringApplication.run(NetworkApplication.class, args);
+
     }
 
     public record FileRecord(List<File> files) {

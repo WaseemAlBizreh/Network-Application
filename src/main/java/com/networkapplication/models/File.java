@@ -18,8 +18,13 @@ import java.util.List;
 public class File {
 
     @Id
-    @GeneratedValue
-    @SequenceGenerator(name = "files_seq", allocationSize = 1)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "file_seq"
+    )
+    @SequenceGenerator(name = "file_seq",
+            sequenceName = "file_seq",
+            allocationSize = 1)
     @Column(
             name = "file_id",
             updatable = false

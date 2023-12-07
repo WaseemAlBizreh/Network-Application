@@ -38,7 +38,9 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public UserDTOResponse register(UserDTORequest userRequest) throws ResponseException {
-
+        if (userRepository.findUserByUsername(userRequest.getUsername()).isPresent())
+            throw new ResponseException(400,
+                    "username is already taken");
         if (!userRequest.getConfirm_password().equals(userRequest.getPassword())) {
             throw new ResponseException(422,
                     "Password and Confirm Password Don't Match");
