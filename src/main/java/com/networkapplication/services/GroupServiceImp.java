@@ -15,6 +15,7 @@ import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,12 +51,12 @@ public class GroupServiceImp implements GroupService {
     public MessageDTO deleteGroup(Long id) throws ResponseException {
         User user = search.getCurrentUser();
         Group group = groupRepository.findById(id)
-                .orElseThrow(() -> new ResponseException(404,"No group Found"));
+                .orElseThrow(() -> new ResponseException(404, "No group Found"));
         if (group.getAdmin().getId().equals(user.getId())) {
             groupRepository.delete(group);
             return MessageDTO.builder().message("deleted successfully").build();
         } else {
-            throw new ResponseException(401,"you dont own this group");
+            throw new ResponseException(401, "you dont own this group");
         }
 
     }
@@ -116,7 +117,7 @@ public class GroupServiceImp implements GroupService {
         //get group
         Group group = groupRepository.findById(group_id)
                 .orElseThrow(() -> new ResponseException(404, "no group found"));
-        if (group.getAdmin().getId().equals(user.getId()) )
+        if (group.getAdmin().getId().equals(user.getId()))
             throw new ResponseException(400,
                     "admin can't leave the group");
         if (!group.getMembers().contains(user))

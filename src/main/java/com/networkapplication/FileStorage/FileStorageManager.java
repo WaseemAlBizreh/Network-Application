@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,7 +16,7 @@ public class FileStorageManager {
 
 
     @Value("${document.uploadDirectory}")
-    private  String uploadDirectory;
+    private String uploadDirectory;
 
 
     @Async

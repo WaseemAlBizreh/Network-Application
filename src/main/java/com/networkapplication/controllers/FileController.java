@@ -7,7 +7,6 @@ import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.services.FileService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -61,8 +60,8 @@ public class FileController {
         return ResponseEntity.ok(services.getFile(fileDTORequest));
     }
 
-    @RequestMapping (path = "/addFile", method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<MainDTO> addFile(@RequestParam MultipartFile file) throws IOException,ResponseException{
+    @RequestMapping(path = "/addFile", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<MainDTO> addFile(@RequestParam MultipartFile file) throws IOException, ResponseException {
         fileStorageManager.save(file);
         return ResponseEntity.ok(services.saveFile(file));
     }

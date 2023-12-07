@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckInDTO implements MainDTO {
-   private Long file_id;
-   private Long user_id;
+    private Long file_id;
+    private Long user_id;
 }

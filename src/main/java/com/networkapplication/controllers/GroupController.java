@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
-
 @RestController
 @RequestMapping("api/group")
 @RequiredArgsConstructor
@@ -40,7 +38,7 @@ public class GroupController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity<MainDTO> addUser(@RequestBody AddUserToGroupRequest request)  {
+    public ResponseEntity<MainDTO> addUser(@RequestBody AddUserToGroupRequest request) {
         try {
             return ResponseEntity.ok(services.addUser(request));
         } catch (ResponseException ex) {
@@ -49,7 +47,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/deleteUser")
-    public ResponseEntity<MainDTO> deleteUser(@RequestBody DeleteDTOUser deleteDTOUser)  {
+    public ResponseEntity<MainDTO> deleteUser(@RequestBody DeleteDTOUser deleteDTOUser) {
         try {
             return ResponseEntity.ok(services.deleteUser(deleteDTOUser));
         } catch (ResponseException ex) {
@@ -58,7 +56,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/leaveGroup/{groupId}")
-    public ResponseEntity<MainDTO> leaveGroup(@PathVariable Long groupId)  {
+    public ResponseEntity<MainDTO> leaveGroup(@PathVariable Long groupId) {
         try {
             return ResponseEntity.ok(services.leaveGroup(groupId));
         } catch (ResponseException ex) {

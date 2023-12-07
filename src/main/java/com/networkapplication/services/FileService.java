@@ -6,7 +6,6 @@ import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
 import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.exceptions.ResponseException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

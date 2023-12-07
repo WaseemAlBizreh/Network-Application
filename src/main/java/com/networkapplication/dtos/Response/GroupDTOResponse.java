@@ -3,7 +3,6 @@ package com.networkapplication.dtos.Response;
 
 import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.UserDTO;
-import com.networkapplication.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
