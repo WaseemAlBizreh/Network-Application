@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListUserGroupsDTOResponse implements MainDTO {
-    private  List<UserGroupsDTOResponse> userGroupsDTOResponses=new ArrayList<>();
+    private List<UserGroupsDTOResponse> userGroupsDTOResponses = new ArrayList<>();
 
 
 }
