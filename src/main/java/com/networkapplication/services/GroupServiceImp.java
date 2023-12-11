@@ -3,10 +3,7 @@ package com.networkapplication.services;
 import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.DeleteDTOUser;
 import com.networkapplication.dtos.Request.GroupDTORequest;
-import com.networkapplication.dtos.Response.GroupDTOResponse;
-import com.networkapplication.dtos.Response.ListUserGroupsDTOResponse;
-import com.networkapplication.dtos.Response.MessageDTO;
-import com.networkapplication.dtos.Response.UserGroupsDTOResponse;
+import com.networkapplication.dtos.Response.*;
 import com.networkapplication.dtos.UserDTO;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.Group;
@@ -51,7 +48,7 @@ public class GroupServiceImp implements GroupService {
     public MessageDTO deleteGroup(Long id) throws ResponseException {
         User user = search.getCurrentUser();
         Group group = groupRepository.findById(id)
-                .orElseThrow(() -> new ResponseException(404, "No group Found"));
+                .orElseThrow(() -> new ResponseException(404, "Group Not Found"));
         if (group.getAdmin().getId().equals(user.getId())) {
             groupRepository.delete(group);
             return MessageDTO.builder().message("deleted successfully").build();
@@ -135,6 +132,9 @@ public class GroupServiceImp implements GroupService {
         User user = search.getCurrentUser();
         List<UserGroupsDTOResponse> userDTOGroups = new ArrayList<>();
         ListUserGroupsDTOResponse listUserGroupsDTOResponse = new ListUserGroupsDTOResponse();
+        if (user.getGroups() == null) {
+            user.setGroups(List.of());
+        }
         for (Group group :
                 user.getGroups()) {
             userDTOGroups.add(new UserGroupsDTOResponse(group));
@@ -142,6 +142,31 @@ public class GroupServiceImp implements GroupService {
         }
         return listUserGroupsDTOResponse;
     }
+
+    @Override
+    public ListMembersDTO getMembers(Long id) throws ResponseException {
+        User user = search.getCurrentUser();
+        Group group = groupRepository.findById(id).orElseThrow(
+                () -> new ResponseException(404, "Group Not Found")
+        );
+        if (!user.getId().equals(group.getAdmin().getId()))
+            throw new ResponseException(403, "unAuthorized");
+        else {
+            if(group.getMembers() == null)
+                group.setMembers(List.of());
+            List<MembersDTO> membersDTOS = new ArrayList<>();
+            ListMembersDTO listMembersDTO = new ListMembersDTO();
+            List<User> members = group.getMembers();
+            for (User user1 :
+                    members
+            ) {
+                membersDTOS.add(new MembersDTO(user1));
+                listMembersDTO.setMembersDTOS(membersDTOS);
+            }
+            return listMembersDTO;
+        }
+    }
+
 
 
 }

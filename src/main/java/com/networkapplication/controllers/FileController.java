@@ -61,9 +61,9 @@ public class FileController {
     }
 
     @RequestMapping(path = "/addFile", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<MainDTO> addFile(@RequestParam MultipartFile file) throws IOException, ResponseException {
-        fileStorageManager.save(file);
-        return ResponseEntity.ok(services.saveFile(file));
+    public ResponseEntity<MainDTO> createFile(@RequestParam MultipartFile file, @PathVariable Long group_id) throws IOException, ResponseException {
+        fileStorageManager.save(file,group_id);
+        return ResponseEntity.ok(services.createFile(file,group_id));
     }
 
     @PostMapping("/checkIn")

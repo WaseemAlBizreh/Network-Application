@@ -3,9 +3,7 @@ package com.networkapplication.services;
 import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.DeleteDTOUser;
 import com.networkapplication.dtos.Request.GroupDTORequest;
-import com.networkapplication.dtos.Response.GroupDTOResponse;
-import com.networkapplication.dtos.Response.ListUserGroupsDTOResponse;
-import com.networkapplication.dtos.Response.MessageDTO;
+import com.networkapplication.dtos.Response.*;
 import com.networkapplication.exceptions.ResponseException;
 
 public interface GroupService {
@@ -21,5 +19,5 @@ public interface GroupService {
 
     ListUserGroupsDTOResponse getAllGroup() throws ResponseException;
 
-
+    ListMembersDTO getMembers(Long id) throws ResponseException;
 }

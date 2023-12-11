@@ -1,5 +1,6 @@
 package com.networkapplication.FileStorage;
 
+import com.networkapplication.models.Group;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,9 @@ public class FileStorageManager {
 
 
     @Async
-    public void save(MultipartFile file) throws IOException {
+    public void save(MultipartFile file,Long group_id) throws IOException {
         String fileName = file.getOriginalFilename();
-        File newFile = new File(uploadDirectory + File.separator + fileName);
+        File newFile = new File(uploadDirectory+"group "+group_id + File.separator + fileName);
         FileOutputStream fileOutputStream = new FileOutputStream(newFile);
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
         bufferedOutputStream.write(file.getBytes());
