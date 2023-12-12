@@ -26,11 +26,21 @@ public class FileController {
     private FileStorageManager fileStorageManager;
 
 
-    @DeleteMapping("/deleteAllFiles")
+    @DeleteMapping("/deleteAllFiles/{groupId}")
     public ResponseEntity<MainDTO> deleteAllFiles(@PathVariable Long groupId) {
         try {
             return ResponseEntity.ok(services.deleteAllInGroup(groupId));
         } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+
+    @GetMapping("getAllFiles/{group_id}")
+    public ResponseEntity<MainDTO> getAllFiles(@PathVariable Long group_id) {
+        try {
+            return ResponseEntity.ok(services.loadAllGroupFiles(group_id));
+        }catch (ResponseException ex)
+        {
             return exceptionHandler.handleException(ex);
         }
     }

@@ -161,8 +161,8 @@ public class GroupServiceImp implements GroupService {
                     members
             ) {
                 membersDTOS.add(new MembersDTO(user1));
-                listMembersDTO.setMembersDTOS(membersDTOS);
             }
+            listMembersDTO.setMembersDTOS(membersDTOS);
             return listMembersDTO;
         }
     }

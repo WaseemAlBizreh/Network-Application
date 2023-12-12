@@ -4,6 +4,7 @@ import com.networkapplication.dtos.Request.CheckInDTO;
 import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
+import com.networkapplication.dtos.Response.ListGroupFilesDTO;
 import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.exceptions.ResponseException;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +17,7 @@ public interface FileService {
 
     MessageDTO deleteAllInGroup(Long group_id) throws ResponseException;
 
-    List<GroupFilesDTOResponse> loadAllGroupFiles(Long groupId) throws ResponseException;
+    ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException;
 
     MessageDTO createFile(MultipartFile file,Long group_id) throws IOException, ResponseException;
 

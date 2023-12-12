@@ -5,6 +5,7 @@ import com.networkapplication.dtos.Request.CheckInDTO;
 import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
+import com.networkapplication.dtos.Response.ListGroupFilesDTO;
 import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.File;
@@ -23,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,26 +40,38 @@ public class FileServiceImp implements FileService {
 
     @Override
     public MessageDTO deleteAllInGroup(Long group_id) throws ResponseException {
-
+        User user=utils.getCurrentUser();
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "No Group Found")
         );
-        List<File> files = group.getFile();
-        fileRepository.deleteAll(files);
-        return MessageDTO.builder().message("Delete All Files").build();
+        if(user.getId().equals(group.getAdmin().getId()))
+        {
+            List<File> files = group.getFile();
+            fileRepository.deleteAll(files);
+            return MessageDTO.builder().message("Delete All Files").build();
+        }else {
+            throw new ResponseException(403,"unAuthorized");
+        }
     }
 
     @Override
-    public List<GroupFilesDTOResponse> loadAllGroupFiles(Long groupId) throws ResponseException {
+    public ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException {
+        User user=utils.getCurrentUser();
         Group group = groupRepository.findById(groupId).orElseThrow(
                 () -> new ResponseException(404, "Group not found"));
-        List<GroupFilesDTOResponse> filesDTOGroupResponses = new ArrayList<>();
-        for (File file :
-                group.getFile()) {
-            filesDTOGroupResponses.add(new GroupFilesDTOResponse(file));
+        if(group.getMembers().contains(user)){
+            List<GroupFilesDTOResponse> filesDTOGroupResponses = new ArrayList<>();
+            ListGroupFilesDTO listGroupFilesDTO=new ListGroupFilesDTO();
+            for (File file :
+                    group.getFile()) {
+                filesDTOGroupResponses.add(new GroupFilesDTOResponse(file));
+            }
+            listGroupFilesDTO.setGroupFilesDTOResponses(filesDTOGroupResponses);
+            return listGroupFilesDTO;
+        }else {
+            throw new ResponseException(403,"You are not in the group");
         }
 
-        return filesDTOGroupResponses;
     }
 
     @Override
@@ -68,7 +80,6 @@ public class FileServiceImp implements FileService {
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "Group notFound")
         );
-
         if (group.getMembers().contains(user)) {
             for (int i = 0; i < group.getFile().size(); i++) {
                 if(Objects.equals(file.getOriginalFilename(), group.getFile().get(i).getFileName())){
@@ -80,6 +91,7 @@ public class FileServiceImp implements FileService {
             }
             File textFile = File.builder()
                     .fileName(file.getOriginalFilename())
+                    .path(uploadDirectory+"\\group"+group_id)
                     .groupFiles(group).ownerFile(user)
                     .lastEditDate(LocalDate.now()).build();
             fileRepository.save(textFile);
@@ -94,7 +106,7 @@ public class FileServiceImp implements FileService {
             bufferedOutputStream.close();
             return MessageDTO.builder().message("file upload").build();
         } else {
-            return MessageDTO.builder().message("you are not found in group").build();
+            return MessageDTO.builder().message("You are not in the group").build();
         }
     }
 
@@ -160,8 +172,6 @@ public class FileServiceImp implements FileService {
         return FileDTOResponse.builder().message("File Not Found In Folder").build();
     }
 
-
-
     @Override
     public synchronized MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
         User user = utils.getCurrentUser();
@@ -181,9 +191,13 @@ public class FileServiceImp implements FileService {
                 throw new ResponseException(403, "you are not found in group");
             }
         }
+        if(user.getMyFiles() == null){
+            user.setMyFiles(List.of());
+        }
         for (int j = 0; j < checkIn.getFile_id().size(); j++) {
             File file = fileRepository.findById(checkIn.getFile_id().get(j)).orElseThrow();
             file.setCheckin(user);
+            user.getMyFiles().add(file);
             fileRepository.save(file);
             userRepository.save(user);
         }
@@ -193,7 +207,6 @@ public class FileServiceImp implements FileService {
     @Override
     public MessageDTO checkOut(CheckInDTO checkOut) throws ResponseException {
         User user = utils.getCurrentUser();
-
         if(checkOut.getFile_id()==null)
         {
             checkOut.setFile_id(List.of());
