@@ -17,6 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -64,15 +67,16 @@ public class FileServiceImp implements FileService {
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "Group notFound")
         );
-        for (int i = 0; i < group.getFile().size(); i++) {
-            if(Objects.equals(file.getOriginalFilename(), group.getFile().get(i).getFileName())){
-                throw new ResponseException(422,"File Name is already Taken");
-            }
-        }
-        if (fileRepository.findFileByUsername(file.getName()).isPresent()) {
-            throw new ResponseException(401, "The File Name already exists");
-        }
+
         if (group.getMembers().contains(user)) {
+            for (int i = 0; i < group.getFile().size(); i++) {
+                if(Objects.equals(file.getOriginalFilename(), group.getFile().get(i).getFileName())){
+                    throw new ResponseException(422,"File Name is already Taken");
+                }
+            }
+            if (fileRepository.findFileByUsername(file.getName()).isPresent()) {
+                throw new ResponseException(401, "The File Name already exists");
+            }
             File textFile = File.builder()
                     .fileName(file.getOriginalFilename())
                     .groupFiles(group).ownerFile(user)
@@ -80,12 +84,18 @@ public class FileServiceImp implements FileService {
             fileRepository.save(textFile);
             groupRepository.save(group);
             userRepository.save(user);
+            String fileName = file.getOriginalFilename();
+            boolean directory = new java.io.File(uploadDirectory+"\\group"+group_id).mkdirs();
+            java.io.File newFile = new java.io.File(uploadDirectory+"\\group"+group_id + java.io.File.separator + fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            bufferedOutputStream.write(file.getBytes());
+            bufferedOutputStream.close();
             return MessageDTO.builder().message("file upload").build();
         } else {
             return MessageDTO.builder().message("you are not found in group").build();
         }
     }
-
     @Override
     public MessageDTO uploadFile(FileDTORequest fileDTORequest) throws ResponseException,IOException {
         java.io.File folder = new java.io.File(uploadDirectory+"group "+fileDTORequest.getGroup_id());

@@ -14,13 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(
-        name = "groups",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "group_name_unique",
-                        columnNames = "group_name"
-                )
-        }
+        name = "groups"
 )
 public class Group {
 

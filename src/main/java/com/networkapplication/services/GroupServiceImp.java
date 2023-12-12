@@ -22,10 +22,17 @@ public class GroupServiceImp implements GroupService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final Utils search;
+    private final FileService fileService;
 
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
         User user = search.getCurrentUser();
+        for (Group group: user.getUserGroups()
+             ) {
+            if (group.getGroupName().equals(request.getGroupName()))
+                throw new ResponseException(422,"you already have a group with such name!!");
+
+        }
         Group group = new Group();
         group.setGroupName(request.getGroupName());
         List<User> members = new ArrayList<>();
@@ -50,6 +57,7 @@ public class GroupServiceImp implements GroupService {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new ResponseException(404, "Group Not Found"));
         if (group.getAdmin().getId().equals(user.getId())) {
+            fileService.deleteAllInGroup(group.getId());
             groupRepository.delete(group);
             return MessageDTO.builder().message("deleted successfully").build();
         } else {
@@ -95,7 +103,7 @@ public class GroupServiceImp implements GroupService {
                 () -> new ResponseException(404, "No User Found"));
         if (admin.getId().equals(group.getAdmin().getId())) {
             if (admin.getId().equals(deleteDTOUser.getUserId()))
-                throw new ResponseException(403, "can't deleted yourself");
+                throw new ResponseException(403, "can't delete yourself");
             if (group.getMembers().contains(user)) {
                 group.getMembers().remove(user);
                 groupRepository.save(group);

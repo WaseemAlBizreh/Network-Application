@@ -74,7 +74,7 @@ public class GroupController {
     }
 
     @GetMapping("/getMembers/{group_id}")
-    public ResponseEntity<MainDTO> getMembers(@RequestParam Long group_id){
+    public ResponseEntity<MainDTO> getMembers(@PathVariable Long group_id){
         try {
             return ResponseEntity.ok(services.getMembers(group_id));
         }catch (ResponseException ex) {
