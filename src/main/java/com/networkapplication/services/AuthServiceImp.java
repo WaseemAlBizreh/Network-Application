@@ -5,6 +5,8 @@ import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.User;
+import com.networkapplication.repositories.FileRepository;
+import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final FileRepository fileRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 

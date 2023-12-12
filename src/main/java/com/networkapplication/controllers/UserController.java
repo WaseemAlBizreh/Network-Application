@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final GroupService groupService;
     private final UserService userService;
     private final GlobalExceptionHandler exceptionHandler;
 

@@ -17,9 +17,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,22 +68,30 @@ public class FileServiceImp implements FileService {
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "Group notFound")
         );
-        for (int i = 0; i < group.getFile().size(); i++) {
-            if(Objects.equals(file.getOriginalFilename(), group.getFile().get(i).getFileName())){
-                throw new ResponseException(422,"File Name is already Taken");
-            }
-        }
-        if (fileRepository.findFileByUsername(file.getName()).isPresent()) {
-            throw new ResponseException(401, "The File Name already exists");
-        }
+
         if (group.getMembers().contains(user)) {
+            for (int i = 0; i < group.getFile().size(); i++) {
+                if(Objects.equals(file.getOriginalFilename(), group.getFile().get(i).getFileName())){
+                    throw new ResponseException(422,"File Name is already Taken");
+                }
+            }
+            if (fileRepository.findFileByUsername(file.getName()).isPresent()) {
+                throw new ResponseException(401, "The File Name already exists");
+            }
             File textFile = File.builder()
                     .fileName(file.getOriginalFilename())
                     .groupFiles(group).ownerFile(user)
-                    .lastEditDate(LocalDate.of(2020, 1, 4)).build();
+                    .lastEditDate(LocalDate.now()).build();
             fileRepository.save(textFile);
             groupRepository.save(group);
             userRepository.save(user);
+            String fileName = file.getOriginalFilename();
+            boolean directory = new java.io.File(uploadDirectory+"\\group"+group_id).mkdirs();
+            java.io.File newFile = new java.io.File(uploadDirectory+"\\group"+group_id + java.io.File.separator + fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            bufferedOutputStream.write(file.getBytes());
+            bufferedOutputStream.close();
             return MessageDTO.builder().message("file upload").build();
         } else {
             return MessageDTO.builder().message("you are not found in group").build();
@@ -87,28 +99,34 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    public MessageDTO uploadFile(FileDTORequest fileDTORequest) throws ResponseException,IOException {
-        java.io.File folder = new java.io.File(uploadDirectory+"group "+fileDTORequest.getGroup_id());
+    public MessageDTO updateFile(MultipartFile file1,Long group_id) throws ResponseException,IOException {
+        java.io.File folder = new java.io.File(uploadDirectory+"group "+group_id);
         java.io.File[] listOfFiles = folder.listFiles();
         assert listOfFiles != null;
         User user=utils.getCurrentUser();
-        Group group = groupRepository.findById(fileDTORequest.getGroup_id()).orElseThrow(
+        Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "Group notFound"
                 ));
         File file=null;
         if (group.getFile()!=null)
         for (int i = 0; i < group.getFile().size(); i++) {
             if (group.getFile().get(i).getCheckin().equals(user) &&
-                group.getFile().get(i).getFileName().equals(fileDTORequest.getFile().getOriginalFilename())){
+                group.getFile().get(i).getFileName().equals(file1.getOriginalFilename())){
                 file=group.getFile().get(i);
                 break;
             }
         }
         if (file==null)
             throw new ResponseException(422,"there is no such file checked in by this name");
-        for (java.io.File file1 : listOfFiles) {
-           if(fileDTORequest.getFile().getOriginalFilename().equals(file1.getName())){
-                fileStorageManager.save(fileDTORequest.getFile(),fileDTORequest.getGroup_id());
+        for (java.io.File file2 : listOfFiles) {
+           if(file1.getOriginalFilename().equals(file2.getName())){
+               String fileName = file1.getOriginalFilename();
+               boolean directory = new java.io.File(uploadDirectory+"\\group"+group_id).mkdirs();
+               java.io.File newFile = new java.io.File(uploadDirectory+"\\group"+group_id + java.io.File.separator + fileName);
+               FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+               BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+               bufferedOutputStream.write(file1.getBytes());
+               bufferedOutputStream.close();
                 return MessageDTO.builder().message("File Updated Successfully").build();
            }
         }
@@ -147,7 +165,12 @@ public class FileServiceImp implements FileService {
     @Override
     public synchronized MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
         User user = utils.getCurrentUser();
+        if(checkIn.getFile_id()==null)
+        {
+            checkIn.setFile_id(List.of());
+        }
         for (int i = 0; i < checkIn.getFile_id().size(); i++) {
+
             File file = fileRepository.findById(checkIn.getFile_id().get(i)).orElseThrow(() ->
                     new ResponseException(404, "File Not Found"));
             if (file.getGroupFiles().getMembers().contains(user)) {
@@ -170,21 +193,29 @@ public class FileServiceImp implements FileService {
     @Override
     public MessageDTO checkOut(CheckInDTO checkOut) throws ResponseException {
         User user = utils.getCurrentUser();
-        File file = fileRepository.findById(checkOut.getFile_id().get(0)).orElseThrow(() ->
-                new ResponseException(404, "File Not Found"));
-        if (file.getGroupFiles().getMembers().contains(user)) {
-            if (file.getCheckin() != null){
-            if (file.getCheckin().getId().equals(user.getId()) ) {
-                file.setCheckin(null);
-                fileRepository.save(file);
-                userRepository.save(user);
-                return MessageDTO.builder().message("File Checked Out Successfully").build();
-            } else {
-                throw new ResponseException(401, "unAuthorized");
-            }} else {
-                throw new ResponseException(400,"File is already checked out");
-            }
-        } else
-            throw new ResponseException(403, "you are not found in group");
+
+        if(checkOut.getFile_id()==null)
+        {
+            checkOut.setFile_id(List.of());
+        }
+        for (int i = 0; i < checkOut.getFile_id().size(); i++) {
+            System.out.println(checkOut.getFile_id().get(i));
+            File file = fileRepository.findById(checkOut.getFile_id().get(i)).orElseThrow(() ->
+                    new ResponseException(404, "File Not Found"));
+            if (file.getGroupFiles().getMembers().contains(user)) {
+                if (file.getCheckin() != null){
+                    if (file.getCheckin().getId().equals(user.getId()) ) {
+                        file.setCheckin(null);
+                        fileRepository.save(file);
+                        userRepository.save(user);
+                    } else {
+                        throw new ResponseException(401, "unAuthorized");
+                    }} else {
+                    throw new ResponseException(400,"File is already checked out");
+                }
+            } else
+                throw new ResponseException(403, "you are not found in group");
+        }
+        return MessageDTO.builder().message("File Checked Out Successfully").build();
     }
 }

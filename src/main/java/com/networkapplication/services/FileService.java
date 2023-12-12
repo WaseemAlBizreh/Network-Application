@@ -12,9 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface FileService {
-//    FileDTOResponse fileUpload(FileDTORequest request) throws ResponseException;
-//
-//    FileDTOResponse loadFile(Long id) throws ResponseException;
+
 
     MessageDTO deleteAllInGroup(Long group_id) throws ResponseException;
 
@@ -24,7 +22,7 @@ public interface FileService {
 
     FileDTOResponse getFile(FileDTORequest fileDTORequest) throws ResponseException;
 
-    MessageDTO uploadFile(FileDTORequest fileDTORequest) throws ResponseException, IOException;
+    MessageDTO updateFile(MultipartFile file,Long group_id) throws ResponseException, IOException;
 
     MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException;
 
