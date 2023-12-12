@@ -5,6 +5,8 @@ import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.User;
+import com.networkapplication.repositories.FileRepository;
+import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -9,7 +9,6 @@ import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.services.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,31 +25,22 @@ public class FileController {
     @Autowired
     private FileStorageManager fileStorageManager;
 
-//    @PostMapping("/upload")
-//    public ResponseEntity<MainDTO> fileUpload(@ModelAttribute FileDTORequest file)  {
-//        try {
-//            return ResponseEntity.ok(services.fileUpload(file));
-//        }catch (ResponseException ex){
-//            return exceptionHandler.handleException(ex);
-//        }
-//
-//    }
-//
-//
-//    @GetMapping("/load/{file_id}")
-//    public ResponseEntity<MainDTO> loadFile(@PathVariable Long file_id) {
-//        try {
-//            return ResponseEntity.ok(services.loadFile(file_id));
-//        }catch (ResponseException ex){
-//            return exceptionHandler.handleException(ex);
-//        }
-//    }
 
-    @DeleteMapping("/deleteAllFiles")
+    @DeleteMapping("/deleteAllFiles/{groupId}")
     public ResponseEntity<MainDTO> deleteAllFiles(@PathVariable Long groupId) {
         try {
             return ResponseEntity.ok(services.deleteAllInGroup(groupId));
         } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+
+    @GetMapping("getAllFiles/{group_id}")
+    public ResponseEntity<MainDTO> getAllFiles(@PathVariable Long group_id) {
+        try {
+            return ResponseEntity.ok(services.loadAllGroupFiles(group_id));
+        }catch (ResponseException ex)
+        {
             return exceptionHandler.handleException(ex);
         }
     }
@@ -60,9 +50,15 @@ public class FileController {
         return ResponseEntity.ok(services.getFile(fileDTORequest));
     }
 
-    @RequestMapping(path = "/addFile/{group_id}")
-    public ResponseEntity<MainDTO> createFile(@RequestParam MultipartFile file, @PathVariable Long group_id) throws IOException, ResponseException {
-        return ResponseEntity.ok(services.createFile(file,group_id));
+    @PostMapping("/addFile/{group_id}")
+    public ResponseEntity<MainDTO> createFile(@RequestParam MultipartFile file, @PathVariable Long group_id) throws ResponseException, IOException {
+        try {
+            return ResponseEntity.ok(services.createFile(file, group_id));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        } catch (IOException exception) {
+            throw new IOException(exception);
+        }
     }
 
     @PostMapping("/checkIn")
@@ -73,5 +69,16 @@ public class FileController {
     @PostMapping("/checkOut")
     public ResponseEntity<MainDTO> checkOut(@RequestBody CheckInDTO checkOut) throws ResponseException {
         return ResponseEntity.ok(services.checkOut(checkOut));
+    }
+
+    @PostMapping("/updateFile/{group_id}")
+    public ResponseEntity<MainDTO> updateFile(@RequestParam MultipartFile file, @PathVariable Long group_id) throws ResponseException, IOException {
+        try {
+            return ResponseEntity.ok(services.updateFile(file, group_id));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        } catch (IOException exception) {
+            throw new IOException(exception);
+        }
     }
 }
