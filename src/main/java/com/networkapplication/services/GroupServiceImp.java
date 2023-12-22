@@ -27,10 +27,10 @@ public class GroupServiceImp implements GroupService {
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
         User user = search.getCurrentUser();
-        for (Group group: user.getUserGroups()
-             ) {
+        for (Group group : user.getUserGroups()
+        ) {
             if (group.getGroupName().equals(request.getGroupName()))
-                throw new ResponseException(422,"you already have a group with such name!!");
+                throw new ResponseException(422, "you already have a group with such name!!");
 
         }
         Group group = new Group();
@@ -160,7 +160,7 @@ public class GroupServiceImp implements GroupService {
         if (!user.getId().equals(group.getAdmin().getId()))
             throw new ResponseException(403, "unAuthorized");
         else {
-            if(group.getMembers() == null)
+            if (group.getMembers() == null)
                 group.setMembers(List.of());
             List<MembersDTO> membersDTOS = new ArrayList<>();
             ListMembersDTO listMembersDTO = new ListMembersDTO();
@@ -175,8 +175,25 @@ public class GroupServiceImp implements GroupService {
         }
     }
 
-
-
+    @Override
+    public UsersSearchDTO getNotMembers(Long id) throws ResponseException {
+        List <User> all=userRepository.findAll();
+        Group group = groupRepository.findById(id).orElseThrow(
+                () -> new ResponseException(404, "Group Not Found")
+        );
+        if (group.getMembers()!=null){
+            List <User> members =group.getMembers();
+            for (User user :members) {
+                all.remove(user);
+            }
+            UsersSearchDTO response=new UsersSearchDTO();
+            response.setUsers(all);
+            return response;
+        }
+        UsersSearchDTO response=new UsersSearchDTO();
+        response.setUsers(all);
+        return response;
+    }
 }
 
 

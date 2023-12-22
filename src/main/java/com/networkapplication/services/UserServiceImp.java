@@ -40,7 +40,7 @@ public class UserServiceImp implements UserService {
             if (users.contains(group.getMembers().get(i)))
                 users.remove(group.getMembers().get(i));
         }
-        UsersSearchDTO response=new UsersSearchDTO();
+        UsersSearchDTO response = new UsersSearchDTO();
         response.setUsers(users);
         return response;
     }

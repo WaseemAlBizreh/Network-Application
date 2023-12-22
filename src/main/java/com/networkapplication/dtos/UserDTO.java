@@ -16,10 +16,10 @@ import java.util.List;
 public class UserDTO implements MainDTO {
     private Long user_id;
     private String user_name;
-    private List<String> user_groups=new ArrayList<>();
-    private List<String> groups=new ArrayList<>();
-    private List<String> files=new ArrayList<>();
-    private List<String> my_files=new ArrayList<>();
+    private List<String> user_groups = new ArrayList<>();
+    private List<String> groups = new ArrayList<>();
+    private List<String> files = new ArrayList<>();
+    private List<String> my_files = new ArrayList<>();
 
     public UserDTO(User user) {
         user_id = user.getId();

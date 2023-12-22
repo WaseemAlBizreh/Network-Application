@@ -19,11 +19,11 @@ public interface FileService {
 
     ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException;
 
-    MessageDTO createFile(MultipartFile file,Long group_id) throws IOException, ResponseException;
+    MessageDTO createFile(MultipartFile file, Long group_id) throws IOException, ResponseException;
 
     FileDTOResponse getFile(FileDTORequest fileDTORequest) throws ResponseException;
 
-    MessageDTO updateFile(MultipartFile file,Long group_id) throws ResponseException, IOException;
+    MessageDTO updateFile(MultipartFile file, Long group_id) throws ResponseException, IOException;
 
     MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException;
 

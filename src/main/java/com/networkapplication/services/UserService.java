@@ -14,6 +14,6 @@ public interface UserService extends UserDetailsService {
     @Override
     UserDetails loadUserByUsername(String username);
 
-    UsersSearchDTO getAllUsers (Long group_id) throws ResponseException;
+    UsersSearchDTO getAllUsers(Long group_id) throws ResponseException;
 
 }

@@ -39,8 +39,7 @@ public class FileController {
     public ResponseEntity<MainDTO> getAllFiles(@PathVariable Long group_id) {
         try {
             return ResponseEntity.ok(services.loadAllGroupFiles(group_id));
-        }catch (ResponseException ex)
-        {
+        } catch (ResponseException ex) {
             return exceptionHandler.handleException(ex);
         }
     }

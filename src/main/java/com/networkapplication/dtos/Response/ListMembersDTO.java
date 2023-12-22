@@ -8,10 +8,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListMembersDTO implements MainDTO {
-   private List<MembersDTO> membersDTOS=new ArrayList();
+    private List<MembersDTO> membersDTOS = new ArrayList();
 }
