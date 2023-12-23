@@ -209,7 +209,6 @@ public class FileServiceImp implements FileService {
             checkOut.setFile_id(List.of());
         }
         for (int i = 0; i < checkOut.getFile_id().size(); i++) {
-            System.out.println(checkOut.getFile_id().get(i));
             File file = fileRepository.findById(checkOut.getFile_id().get(i)).orElseThrow(() ->
                     new ResponseException(404, "File Not Found"));
             if (file.getGroupFiles().getMembers().contains(user)) {
