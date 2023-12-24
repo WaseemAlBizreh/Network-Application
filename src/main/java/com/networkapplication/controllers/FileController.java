@@ -25,11 +25,10 @@ public class FileController {
     @Autowired
     private FileStorageManager fileStorageManager;
 
-
     @DeleteMapping("/deleteAllFiles/{groupId}")
     public ResponseEntity<MainDTO> deleteAllFiles(@PathVariable Long groupId) {
         try {
-            return ResponseEntity.ok(services.deleteAllInGroup(groupId));
+            return ResponseEntity.ok(services.deleteAllFilesInGroup(groupId));
         } catch (ResponseException ex) {
             return exceptionHandler.handleException(ex);
         }
@@ -47,7 +46,11 @@ public class FileController {
 
     @PostMapping("/getFile")
     public ResponseEntity<MainDTO> getFile(@RequestBody FileDTORequest fileDTORequest) throws ResponseException {
-        return ResponseEntity.ok(services.getFile(fileDTORequest));
+        try {
+            return ResponseEntity.ok(services.getFile(fileDTORequest));
+        }catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
     }
 
     @PostMapping("/addFile/{group_id}")
@@ -63,12 +66,20 @@ public class FileController {
 
     @PostMapping("/checkIn")
     public ResponseEntity<MainDTO> checkIn(@RequestBody CheckInDTO check) throws ResponseException {
-        return ResponseEntity.ok(services.checkIn(check));
+        try{
+            return ResponseEntity.ok(services.checkIn(check));
+        }catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
     }
 
     @PostMapping("/checkOut")
     public ResponseEntity<MainDTO> checkOut(@RequestBody CheckInDTO checkOut) throws ResponseException {
-        return ResponseEntity.ok(services.checkOut(checkOut));
+        try {
+            return ResponseEntity.ok(services.checkOut(checkOut));
+        }catch (ResponseException ex){
+            return exceptionHandler.handleException(ex);
+        }
     }
 
     @PostMapping("/updateFile/{group_id}")
@@ -81,4 +92,14 @@ public class FileController {
             throw new IOException(exception);
         }
     }
+
+    @DeleteMapping("/deleteFile/{group_id}")
+    public ResponseEntity<MainDTO> deleteFile(@PathVariable Long group_id,@RequestBody CheckInDTO files_id) throws ResponseException{
+        try {
+            return ResponseEntity.ok(services.deleteFile(group_id,files_id));
+        }catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+
 }

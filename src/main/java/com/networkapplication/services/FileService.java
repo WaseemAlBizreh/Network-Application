@@ -15,7 +15,7 @@ import java.util.List;
 public interface FileService {
 
 
-    MessageDTO deleteAllInGroup(Long group_id) throws ResponseException;
+    MessageDTO deleteAllFilesInGroup(Long group_id) throws ResponseException;
 
     ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException;
 
@@ -28,4 +28,6 @@ public interface FileService {
     MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException;
 
     MessageDTO checkOut(CheckInDTO checkIn) throws ResponseException;
+
+    MessageDTO deleteFile(Long groupId,CheckInDTO filesId) throws ResponseException;
 }

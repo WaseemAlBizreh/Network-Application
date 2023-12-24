@@ -6,8 +6,10 @@ import com.networkapplication.dtos.Request.GroupDTORequest;
 import com.networkapplication.dtos.Response.*;
 import com.networkapplication.dtos.UserDTO;
 import com.networkapplication.exceptions.ResponseException;
+import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
+import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.util.List;
 public class GroupServiceImp implements GroupService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final FileRepository fileRepository;
     private final Utils search;
     private final FileService fileService;
 
@@ -57,7 +60,7 @@ public class GroupServiceImp implements GroupService {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new ResponseException(404, "Group Not Found"));
         if (group.getAdmin().getId().equals(user.getId())) {
-            fileService.deleteAllInGroup(group.getId());
+            fileService.deleteAllFilesInGroup(group.getId());
             groupRepository.delete(group);
             return MessageDTO.builder().message("deleted successfully").build();
         } else {
@@ -105,6 +108,12 @@ public class GroupServiceImp implements GroupService {
             if (admin.getId().equals(deleteDTOUser.getUserId()))
                 throw new ResponseException(403, "can't delete yourself");
             if (group.getMembers().contains(user)) {
+                for (int i = 0; i <user.getMyFiles().size() ; i++) {
+                   File file= user.getMyFiles().get(i);
+                   file.setCheckin(null);
+                   fileRepository.save(file);
+
+                }
                 group.getMembers().remove(user);
                 groupRepository.save(group);
                 userRepository.save(user);

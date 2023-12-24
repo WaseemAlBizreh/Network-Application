@@ -33,14 +33,15 @@ public class UserServiceImp implements UserService {
                 () -> new ResponseException(404, "Group Not Found")
         );
         List<User> users = userRepository.findAll();
-        if (group.getMembers() != null) {
+        if (group.getMembers() == null) {
             group.setMembers(List.of());
         }
         for (int i = 0; i < group.getMembers().size(); i++) {
-            if (users.contains(group.getMembers().get(i)))
+            if (users.contains(group.getMembers().get(i))) {
                 users.remove(group.getMembers().get(i));
+            }
         }
-        UsersSearchDTO response=new UsersSearchDTO();
+        UsersSearchDTO response = new UsersSearchDTO();
         response.setUsers(users);
         return response;
     }
