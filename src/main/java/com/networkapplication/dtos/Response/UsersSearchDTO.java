@@ -18,9 +18,9 @@ public class UsersSearchDTO implements MainDTO {
     List<UserSearchDTO> userSearchDTOS = new ArrayList<>();
 
     public void setUsers(List<User> users) {
-        for (User user:
-             users) {
-            userSearchDTOS.add(new UserSearchDTO(user.getId(),user.getUsername()));
+        for (User user :
+                users) {
+            userSearchDTOS.add(new UserSearchDTO(user.getId(), user.getUsername()));
         }
     }
 }

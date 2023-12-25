@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "user_app",
         uniqueConstraints = {
@@ -72,6 +76,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Auditing> logs;
+
+    @CreatedDate
+    private LocalDateTime CreatedDate;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

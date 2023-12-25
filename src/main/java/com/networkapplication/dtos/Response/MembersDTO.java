@@ -15,8 +15,8 @@ public class MembersDTO implements MainDTO {
     private Long user_id;
     private String user_name;
 
-    public MembersDTO(User user){
-        this.user_id=user.getId();
-        this.user_name=user.getUsername();
+    public MembersDTO(User user) {
+        this.user_id = user.getId();
+        this.user_name = user.getUsername();
     }
 }

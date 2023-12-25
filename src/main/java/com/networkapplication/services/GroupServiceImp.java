@@ -30,10 +30,10 @@ public class GroupServiceImp implements GroupService {
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
         User user = search.getCurrentUser();
-        for (Group group: user.getUserGroups()
-             ) {
+        for (Group group : user.getUserGroups()
+        ) {
             if (group.getGroupName().equals(request.getGroupName()))
-                throw new ResponseException(422,"you already have a group with such name!!");
+                throw new ResponseException(422, "you already have a group with such name!!");
 
         }
         Group group = new Group();
@@ -169,7 +169,7 @@ public class GroupServiceImp implements GroupService {
         if (!user.getId().equals(group.getAdmin().getId()))
             throw new ResponseException(403, "unAuthorized");
         else {
-            if(group.getMembers() == null)
+            if (group.getMembers() == null)
                 group.setMembers(List.of());
             List<MembersDTO> membersDTOS = new ArrayList<>();
             ListMembersDTO listMembersDTO = new ListMembersDTO();

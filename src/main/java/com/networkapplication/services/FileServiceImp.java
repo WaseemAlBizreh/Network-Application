@@ -108,7 +108,7 @@ public class FileServiceImp implements FileService {
             bufferedOutputStream.close();
             return MessageDTO.builder().message("file upload").build();
         } else {
-            return MessageDTO.builder().message("You are not in the group").build();
+            throw new ResponseException(403, "you are not a member in this group");
         }
     }
 
@@ -224,7 +224,6 @@ public class FileServiceImp implements FileService {
             checkOut.setFile_id(List.of());
         }
         for (int i = 0; i < checkOut.getFile_id().size(); i++) {
-            System.out.println(checkOut.getFile_id().get(i));
             File file = fileRepository.findById(checkOut.getFile_id().get(i)).orElseThrow(() ->
                     new ResponseException(404, "File Not Found"));
             if (file.getGroupFiles().getMembers().contains(user)) {

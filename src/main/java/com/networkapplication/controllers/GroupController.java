@@ -74,10 +74,19 @@ public class GroupController {
     }
 
     @GetMapping("/getMembers/{group_id}")
-    public ResponseEntity<MainDTO> getMembers(@PathVariable Long group_id){
+    public ResponseEntity<MainDTO> getMembers(@PathVariable Long group_id) {
         try {
             return ResponseEntity.ok(services.getMembers(group_id));
-        }catch (ResponseException ex) {
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+@GetMapping("/getNotmembers/{group_id}")
+    public ResponseEntity<MainDTO> getNotMembers(@PathVariable Long group_id){
+        try
+        {
+            return ResponseEntity.ok(services.getNotMembers(group_id));
+        }catch (ResponseException ex){
             return exceptionHandler.handleException(ex);
         }
     }
