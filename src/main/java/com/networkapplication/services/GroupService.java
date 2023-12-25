@@ -20,4 +20,6 @@ public interface GroupService {
     ListUserGroupsDTOResponse getAllGroup() throws ResponseException;
 
     ListMembersDTO getMembers(Long id) throws ResponseException;
+
+    ListUserGroupsDTOResponse getMyGroup() throws ResponseException;
 }

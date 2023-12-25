@@ -184,7 +184,20 @@ public class GroupServiceImp implements GroupService {
         }
     }
 
+    @Override
+    public ListUserGroupsDTOResponse getMyGroup() throws ResponseException {
+        User user = search.getCurrentUser();
+        List<UserGroupsDTOResponse> userDTOGroups = new ArrayList<>();
+        ListUserGroupsDTOResponse listUserGroupsDTOResponse = new ListUserGroupsDTOResponse();
+        if(user.getUserGroups()==null)
+            throw new ResponseException(404, "You don't have any group");
 
+        for (Group group : user.getUserGroups()) {
+            userDTOGroups.add(new UserGroupsDTOResponse(group));
+            listUserGroupsDTOResponse.setUserGroupsDTOResponses(userDTOGroups);
+        }
+        return listUserGroupsDTOResponse;
+    }
 
 }
 

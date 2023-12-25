@@ -81,4 +81,13 @@ public class GroupController {
             return exceptionHandler.handleException(ex);
         }
     }
+
+    @GetMapping("/getMyGroup")
+    public ResponseEntity<MainDTO> getMyGroup() {
+        try {
+            return ResponseEntity.ok(services.getMyGroup());
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
 }

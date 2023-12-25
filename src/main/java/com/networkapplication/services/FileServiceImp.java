@@ -23,9 +23,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +74,6 @@ public class FileServiceImp implements FileService {
         } else {
             throw new ResponseException(403, "You are not in the group");
         }
-
     }
 
     @Override
@@ -204,7 +201,19 @@ public class FileServiceImp implements FileService {
             user.getMyFiles().add(file);
             fileRepository.save(file);
             userRepository.save(user);
+            Timer timer = new Timer("FileCheckInTimer");
+            long delayInMillis = 60*1000; // تعديل الوقت حسب الحاجة (3 أيام)
+
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                   file.setCheckin(null);
+                   fileRepository.save(file);
+                   userRepository.save(user);
+                }
+            }, new Date(System.currentTimeMillis() + delayInMillis));
         }
+
         return MessageDTO.builder().message("CheckIn Success").build();
     }
 
