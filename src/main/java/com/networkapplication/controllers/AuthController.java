@@ -36,6 +36,7 @@ public class AuthController {
             return exceptionHandler.handleException(ex);
         }
     }
+
 }
 
 //    @DeleteMapping("/logout")

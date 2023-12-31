@@ -1,5 +1,6 @@
 package com.networkapplication.services;
 
+import com.networkapplication.FileStorage.FilePath;
 import com.networkapplication.dtos.Request.CheckInDTO;
 import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Response.FileDTOResponse;
@@ -16,12 +17,22 @@ import com.networkapplication.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -93,15 +104,14 @@ public class FileServiceImp implements FileService {
             }
             File textFile = File.builder()
                     .fileName(file.getOriginalFilename())
-                    .path(uploadDirectory + "\\group" + group_id)
+                    .path(System.getProperty("user.home") + "/Desktop\\Network-Project"+ "\\group" + group_id)
                     .groupFiles(group).ownerFile(user)
                     .lastEditDate(LocalDate.now()).build();
             fileRepository.save(textFile);
             groupRepository.save(group);
             userRepository.save(user);
             String fileName = file.getOriginalFilename();
-            boolean directory = new java.io.File(uploadDirectory + "\\group" + group_id).mkdirs();
-            java.io.File newFile = new java.io.File(uploadDirectory + "\\group" + group_id + java.io.File.separator + fileName);
+            java.io.File newFile = FilePath.createFile(fileName,group_id);
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
             bufferedOutputStream.write(file.getBytes());
@@ -112,9 +122,45 @@ public class FileServiceImp implements FileService {
         }
     }
 
+
+    @Override
+    public ResponseEntity<Resource> getFile(Long group_id, String file_name) throws ResponseException {
+
+
+        java.io.File folder = new java.io.File(System.getProperty("user.home") + "/Desktop\\Network-Project\\group"+group_id);
+        User user = utils.getCurrentUser();
+        Group group = groupRepository.findById(group_id).orElseThrow(
+                () -> new ResponseException(404, "GroupNotFound")
+        );
+        if (!group.getMembers().contains(user)) {
+            throw new ResponseException(401, "unAuthorized");
+        }
+        File file = fileRepository.findFileByUsername(file_name).orElseThrow(
+                () -> new ResponseException(404, "Not Found File")
+        );
+        java.io.File[] listOfFiles = folder.listFiles();
+        assert listOfFiles != null;
+        for (java.io.File file1 : listOfFiles) {
+            if (file1.getName().equals(file_name)) {
+                String filePath = System.getProperty("user.home") + "/Desktop\\Network-Project\\group"+group_id+"\\"+file_name;
+                Resource resource = new FileSystemResource(filePath);
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=file");
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .contentType(MediaTypeFactory.getMediaType(resource).orElse(MediaType.ALL))
+                        .body(resource);
+
+            }
+        }
+        throw new ResponseException(404,"File Not Found");
+    }
+
+
     @Override
     public MessageDTO updateFile(MultipartFile file1, Long group_id) throws ResponseException, IOException {
-        java.io.File folder = new java.io.File(uploadDirectory + "\\group" + group_id);
+        java.io.File folder = new java.io.File(System.getProperty("user.home") + "/Desktop\\Network-Project"+ "\\group" + group_id);
         java.io.File[] listOfFiles = folder.listFiles();
         assert listOfFiles != null;
         User user = utils.getCurrentUser();
@@ -124,19 +170,21 @@ public class FileServiceImp implements FileService {
         File file = null;
         if (group.getFile() != null)
             for (int i = 0; i < group.getFile().size(); i++) {
-                if (group.getFile().get(i).getCheckin().equals(user) &&
-                        group.getFile().get(i).getFileName().equals(file1.getOriginalFilename())) {
-                    file = group.getFile().get(i);
-                    break;
-                }
+              if (group.getFile().get(i).getCheckin()!=null){
+                  if (group.getFile().get(i).getCheckin().equals(user) &&
+                          group.getFile().get(i).getFileName().equals(file1.getOriginalFilename())) {
+                      file = group.getFile().get(i);
+                      break;
+                  }
+              }
             }
         if (file == null)
             throw new ResponseException(422, "there is no such file checked in by this name");
         for (java.io.File file2 : listOfFiles) {
             if (file1.getOriginalFilename().equals(file2.getName())) {
                 String fileName = file1.getOriginalFilename();
-                boolean directory = new java.io.File(uploadDirectory + "\\group" + group_id).mkdirs();
-                java.io.File newFile = new java.io.File(uploadDirectory + "\\group" + group_id + java.io.File.separator + fileName);
+
+                java.io.File newFile =FilePath.createFile(fileName,group_id);
                 FileOutputStream fileOutputStream = new FileOutputStream(newFile);
                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                 bufferedOutputStream.write(file1.getBytes());
@@ -147,32 +195,6 @@ public class FileServiceImp implements FileService {
         throw new ResponseException(404, "File Not Found ");
     }
 
-    @Override
-    public FileDTOResponse getFile(FileDTORequest fileDTORequest) throws ResponseException {
-        java.io.File folder = new java.io.File(uploadDirectory);
-        User user = utils.getCurrentUser();
-        Group group = groupRepository.findById(fileDTORequest.getGroup_id()).orElseThrow(
-                () -> new ResponseException(404, "GroupNotFound")
-        );
-        if (!group.getMembers().contains(user)) {
-            throw new ResponseException(401, "unAuthorized");
-        }
-        File file = fileRepository.findFileByUsername(fileDTORequest.getFile_name()).orElseThrow(
-                () -> new ResponseException(404, "Not Found File")
-        );
-        java.io.File[] listOfFiles = folder.listFiles();
-        assert listOfFiles != null;
-        for (java.io.File file1 : listOfFiles) {
-            if (file1.getName().equals(fileDTORequest.getFile_name())) {
-                return FileDTOResponse.builder()
-                        .file_id(file.getId())
-                        .file_name(fileDTORequest.getFile_name())
-                        .path(file.getPath())
-                        .message("Success").build();
-            }
-        }
-        return FileDTOResponse.builder().message("File Not Found In Folder").build();
-    }
 
     @Override
     public synchronized MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
@@ -202,14 +224,14 @@ public class FileServiceImp implements FileService {
             fileRepository.save(file);
             userRepository.save(user);
             Timer timer = new Timer("FileCheckInTimer");
-            long delayInMillis = 60*1000; // تعديل الوقت حسب الحاجة (3 أيام)
+            long delayInMillis = 3*60*60*1000; // تعديل الوقت حسب الحاجة (3 أيام)
 
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                   file.setCheckin(null);
-                   fileRepository.save(file);
-                   userRepository.save(user);
+                    file.setCheckin(null);
+                    fileRepository.save(file);
+                    userRepository.save(user);
                 }
             }, new Date(System.currentTimeMillis() + delayInMillis));
         }

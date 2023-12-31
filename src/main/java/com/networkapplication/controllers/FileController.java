@@ -3,17 +3,33 @@ package com.networkapplication.controllers;
 import com.networkapplication.FileStorage.FileStorageManager;
 import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.Request.CheckInDTO;
-import com.networkapplication.dtos.Request.FileDTORequest;
+import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.services.FileService;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/file")
@@ -34,7 +50,7 @@ public class FileController {
         }
     }
 
-    @GetMapping("getAllFiles/{group_id}")
+    @GetMapping("/getAllFiles/{group_id}")
     public ResponseEntity<MainDTO> getAllFiles(@PathVariable Long group_id) {
         try {
             return ResponseEntity.ok(services.loadAllGroupFiles(group_id));
@@ -43,14 +59,6 @@ public class FileController {
         }
     }
 
-    @PostMapping("/getFile")
-    public ResponseEntity<MainDTO> getFile(@RequestBody FileDTORequest fileDTORequest) throws ResponseException {
-        try {
-            return ResponseEntity.ok(services.getFile(fileDTORequest));
-        }catch (ResponseException ex) {
-            return exceptionHandler.handleException(ex);
-        }
-    }
 
     @PostMapping("/addFile/{group_id}")
     public ResponseEntity<MainDTO> createFile(@RequestParam MultipartFile file, @PathVariable Long group_id) throws ResponseException, IOException {
@@ -101,4 +109,16 @@ public class FileController {
         }
     }
 
+
+    @GetMapping("/getFile/{group_id}/{name}")
+    public ResponseEntity<Resource> getFile(@PathVariable Long group_id ,@PathVariable String name) throws ResponseException {
+        try {
+            return services.getFile(group_id,name);
+        }catch (ResponseException ex){
+            throw new ResponseException(ex.getStatusCode(),ex.getMessage());
+        }
+    }
 }
+
+
+

@@ -81,15 +81,6 @@ public class GroupController {
             return exceptionHandler.handleException(ex);
         }
     }
-@GetMapping("/getNotmembers/{group_id}")
-    public ResponseEntity<MainDTO> getNotMembers(@PathVariable Long group_id){
-        try
-        {
-            return ResponseEntity.ok(services.getNotMembers(group_id));
-        }catch (ResponseException ex){
-            return exceptionHandler.handleException(ex);
-        }
-    }
 
     @GetMapping("/getMyGroup")
     public ResponseEntity<MainDTO> getMyGroup() {
