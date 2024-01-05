@@ -2,6 +2,7 @@ package com.networkapplication.services;
 
 import com.networkapplication.dtos.Request.CheckInDTO;
 import com.networkapplication.dtos.Request.FileDTORequest;
+import com.networkapplication.dtos.Request.FileName;
 import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
 import com.networkapplication.dtos.Response.ListGroupFilesDTO;
@@ -24,7 +25,7 @@ public interface FileService {
 
     MessageDTO createFile(MultipartFile file, Long group_id) throws IOException, ResponseException;
 
-    ResponseEntity<Resource> getFile(Long group_id, String file_name) throws ResponseException;
+    ResponseEntity<Resource> getFile(Long group_id, FileName file_name) throws ResponseException;
 
     MessageDTO updateFile(MultipartFile file, Long group_id) throws ResponseException, IOException;
 

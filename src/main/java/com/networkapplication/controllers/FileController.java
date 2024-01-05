@@ -3,6 +3,8 @@ package com.networkapplication.controllers;
 import com.networkapplication.FileStorage.FileStorageManager;
 import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.Request.CheckInDTO;
+import com.networkapplication.dtos.Request.FileDTORequest;
+import com.networkapplication.dtos.Request.FileName;
 import com.networkapplication.dtos.Response.FileDTOResponse;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.exceptions.ResponseException;
@@ -110,8 +112,8 @@ public class FileController {
     }
 
 
-    @GetMapping("/getFile/{group_id}/{name}")
-    public ResponseEntity<Resource> getFile(@PathVariable Long group_id ,@PathVariable String name) throws ResponseException {
+    @PostMapping("/getFile/{group_id}")
+    public ResponseEntity<Resource> getFile(@PathVariable Long group_id ,@RequestBody FileName name) throws ResponseException {
         try {
             return services.getFile(group_id,name);
         }catch (ResponseException ex){
