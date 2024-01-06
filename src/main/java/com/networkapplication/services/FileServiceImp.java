@@ -166,7 +166,7 @@ public class FileServiceImp implements FileService {
             for (int i = 0; i < group.getFile().size(); i++) {
                 if (group.getFile().get(i).getCheckin() != null) {
                     if (group.getFile().get(i).getCheckin().equals(user) &&
-                            group.getFile().get(i).getFileName().equals(file1.getOriginalFilename())) {
+                            group.getFile().get(i).getFileName().replace(group_id.toString(),"").equals(file1.getOriginalFilename())) {
                         file = group.getFile().get(i);
                         break;
                     }
@@ -191,7 +191,7 @@ public class FileServiceImp implements FileService {
 
 
     @Override
-    public synchronized MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
+    public  MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
         User user = utils.getCurrentUser();
         if (checkIn.getFile_id() == null) {
             checkIn.setFile_id(List.of());
@@ -205,7 +205,7 @@ public class FileServiceImp implements FileService {
                     throw new ResponseException(403, file.getFileName() + " is CheckIN");
                 }
             } else {
-                throw new ResponseException(403, "you are not found in group");
+              return MessageDTO.builder().message("you are not found in group").build();
             }
         }
         if (user.getMyFiles() == null) {

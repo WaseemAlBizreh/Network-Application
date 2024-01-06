@@ -22,6 +22,7 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public UserDTOResponse login(UserDTORequest request) throws ResponseException {
+
         User user = userRepository.findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseException(404, "User Not Found"));
 
