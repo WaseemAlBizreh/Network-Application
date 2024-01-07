@@ -12,6 +12,7 @@ import com.networkapplication.models.User;
 import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class GroupServiceImp implements GroupService {
     private final Utils search;
     private final FileService fileService;
 
+    @Transactional
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
         User user = search.getCurrentUser();
@@ -54,6 +56,7 @@ public class GroupServiceImp implements GroupService {
                 .build();
     }
 
+    @Transactional
     @Override
     public MessageDTO deleteGroup(Long id) throws ResponseException {
         User user = search.getCurrentUser();
@@ -64,11 +67,12 @@ public class GroupServiceImp implements GroupService {
             groupRepository.delete(group);
             return MessageDTO.builder().message("deleted successfully").build();
         } else {
-            throw new ResponseException(401, "you dont own this group");
+            throw new ResponseException(401, "you don't own this group");
         }
 
     }
 
+    @Transactional
     @Override
     public MessageDTO addUser(AddUserToGroupRequest request) throws ResponseException {
 
@@ -94,6 +98,7 @@ public class GroupServiceImp implements GroupService {
         return MessageDTO.builder().message("user added successfully").build();
     }
 
+    @Transactional
     @Override
     public MessageDTO deleteUser(DeleteDTOUser deleteDTOUser) throws ResponseException {
         //get admin
@@ -124,6 +129,7 @@ public class GroupServiceImp implements GroupService {
 
     }
 
+    @Transactional
     @Override
     public MessageDTO leaveGroup(Long group_id) throws ResponseException {
         //get user
@@ -144,6 +150,7 @@ public class GroupServiceImp implements GroupService {
         return MessageDTO.builder().message("user left the group successfully").build();
     }
 
+
     @Override
     public ListUserGroupsDTOResponse getAllGroup() throws ResponseException {
         User user = search.getCurrentUser();
@@ -159,6 +166,7 @@ public class GroupServiceImp implements GroupService {
         }
         return listUserGroupsDTOResponse;
     }
+
 
     @Override
     public ListMembersDTO getMembers(Long id) throws ResponseException {

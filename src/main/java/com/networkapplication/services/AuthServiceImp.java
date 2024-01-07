@@ -8,6 +8,7 @@ import com.networkapplication.models.User;
 import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class AuthServiceImp implements AuthService {
         return response;
     }
 
+    @Transactional
     @Override
     public UserDTOResponse register(UserDTORequest userRequest) throws ResponseException {
         if (userRepository.findUserByUsername(userRequest.getUsername()).isPresent())

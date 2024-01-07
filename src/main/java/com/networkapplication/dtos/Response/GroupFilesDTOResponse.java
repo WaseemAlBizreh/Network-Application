@@ -13,13 +13,11 @@ import lombok.NoArgsConstructor;
 public class GroupFilesDTOResponse {
     private Long fileId;
     private String fileName;
-    private String path;
     private boolean status;
 
     public GroupFilesDTOResponse(File file,boolean status) {
         fileId = file.getId();
         fileName = file.getFileName();
-        path = file.getPath();
         this.status=status;
     }
 }
