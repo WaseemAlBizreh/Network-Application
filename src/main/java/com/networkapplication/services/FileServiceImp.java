@@ -289,6 +289,8 @@ public class FileServiceImp implements FileService {
                         || user.getId().equals(group.getAdmin().getId()))) {
                     fileRepository.delete(file);
                     userRepository.save(user);
+                } else {
+                    throw new ResponseException(403,"unAuthorized");
                 }
             }
         } else {
