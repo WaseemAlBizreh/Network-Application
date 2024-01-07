@@ -263,6 +263,7 @@ public class FileServiceImp implements FileService {
     @Override
     public MessageDTO deleteFile(Long groupId, CheckInDTO filesId) throws ResponseException {
 //      get user or admin
+//      TODO:check and fix
         User user = utils.getCurrentUser();
         Group group = groupRepository.findById(groupId).orElseThrow(
                 () -> new ResponseException(404, "Not Found Group")

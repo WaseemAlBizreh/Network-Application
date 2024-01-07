@@ -27,7 +27,7 @@ public class GroupController {
         }
     }
 
-    // TODO: 12/4/2023 يوجد معالجة للخطأ 
+
     @DeleteMapping("/deleteGroup/{groupId}")
     public ResponseEntity<MainDTO> deleteGroup(@PathVariable Long groupId) {
         try {

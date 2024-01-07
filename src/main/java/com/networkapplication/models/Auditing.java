@@ -37,7 +37,7 @@ public class Auditing {
     User user;
 
 
-    Long fileID;
+    Long affectedID;
 
 
 }
