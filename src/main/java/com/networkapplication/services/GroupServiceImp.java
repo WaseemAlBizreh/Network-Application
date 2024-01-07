@@ -28,7 +28,7 @@ public class GroupServiceImp implements GroupService {
     private final Utils search;
     private final FileService fileService;
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
         User user = search.getCurrentUser();
@@ -56,7 +56,7 @@ public class GroupServiceImp implements GroupService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteGroup(Long id) throws ResponseException {
         User user = search.getCurrentUser();
@@ -72,7 +72,7 @@ public class GroupServiceImp implements GroupService {
 
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO addUser(AddUserToGroupRequest request) throws ResponseException {
 
@@ -98,7 +98,7 @@ public class GroupServiceImp implements GroupService {
         return MessageDTO.builder().message("user added successfully").build();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteUser(DeleteDTOUser deleteDTOUser) throws ResponseException {
         //get admin
@@ -130,7 +130,7 @@ public class GroupServiceImp implements GroupService {
 
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO leaveGroup(Long group_id) throws ResponseException {
         //get user

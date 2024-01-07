@@ -43,7 +43,7 @@ public class FileServiceImp implements FileService {
     private final Utils utils;
     private static final ConcurrentHashMap<Long, Object> locks = new ConcurrentHashMap<>();
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteAllFilesInGroup(Long group_id) throws ResponseException {
 
@@ -85,7 +85,7 @@ public class FileServiceImp implements FileService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO createFile(MultipartFile file, Long group_id) throws IOException, ResponseException {
         User user = utils.getCurrentUser();
@@ -193,8 +193,9 @@ public class FileServiceImp implements FileService {
         throw new ResponseException(404, "File Not Found ");
     }
 
-    @Transactional
+
     @Override
+    @Transactional (rollbackOn = ResponseException.class)
     public MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
 
         User user = utils.getCurrentUser();
@@ -227,7 +228,7 @@ public class FileServiceImp implements FileService {
                     fileRepository.save(file);
                     userRepository.save(user);
                     Timer timer = new Timer("FileCheckInTimer");
-                    long delayInMillis = 3 * 60 * 60 * 1000; // تعديل الوقت حسب الحاجة (3 أيام)
+                    long delayInMillis = 3 * 60 * 60 * 1000;
 
                     timer.schedule(new TimerTask() {
                         @Override
@@ -243,7 +244,7 @@ public class FileServiceImp implements FileService {
         return MessageDTO.builder().message("CheckIn Success").build();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO checkOut(CheckInDTO checkOut) throws ResponseException {
         User user = utils.getCurrentUser();
@@ -271,7 +272,7 @@ public class FileServiceImp implements FileService {
         return MessageDTO.builder().message("File Checked Out Successfully").build();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteFile(Long groupId, CheckInDTO filesId) throws ResponseException {
 //      get user or admin
