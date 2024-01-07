@@ -29,50 +29,41 @@ public class Log {
     private final FileRepository fileRepository;
     private final Utils utils;
     private final UserRepository userRepository;
+
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.FileService.checkIn(..)) && args(checkIn)", returning = "result")
     public void logCheckin(JoinPoint joinPoint, Object result, CheckInDTO checkIn) throws ResponseException {
         User user = utils.getCurrentUser();
-        List<Long> files=checkIn.getFile_id();
-       // System.out.println(files.size());
-        for (Long file:files
-             ) {
+        List<Long> files = checkIn.getFile_id();
+        // System.out.println(files.size());
+        for (Long file : files
+        ) {
             File f = fileRepository.findById(file).orElseThrow(() ->
                     new ResponseException(404, "File Not Found"));
-            Auditing auditing= Auditing.builder().user(user).operation("checkin").file(f).date(LocalDate.now()).build();
-            if (user.getLogs()==null)
+            Auditing auditing = Auditing.builder().user(user).operation("checkin").fileID(f.getId()).date(LocalDate.now()).build();
+            if (user.getLogs() == null)
                 user.setLogs(List.of(auditing));
             else user.getLogs().add(auditing);
-            if (f.getLogs()==null)
-                f.setLogs(List.of(auditing));
-            else f.getLogs().add(auditing);
             auditingRepository.save(auditing);
             userRepository.save(user);
             fileRepository.save(f);
         }
-
     }
 
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.FileService.checkOut(..)) && args(checkOut)", returning = "result")
     public void logCheckout(JoinPoint joinPoint, Object result, CheckInDTO checkOut) throws ResponseException {
         User user = utils.getCurrentUser();
-        List<Long> files=checkOut.getFile_id();
-        // System.out.println(files.size());
-        for (Long file:files
+        List<Long> files = checkOut.getFile_id();
+        for (Long file : files
         ) {
             File f = fileRepository.findById(file).orElseThrow(() ->
                     new ResponseException(404, "File Not Found"));
-            Auditing auditing= Auditing.builder().user(user).operation("checkout").file(f).date(LocalDate.now()).build();
-            if (user.getLogs()==null)
+            Auditing auditing = Auditing.builder().user(user).operation("checkout").fileID(f.getId()).date(LocalDate.now()).build();
+            if (user.getLogs() == null)
                 user.setLogs(List.of(auditing));
             else user.getLogs().add(auditing);
-            if (f.getLogs()==null)
-                f.setLogs(List.of(auditing));
-            else f.getLogs().add(auditing);
             auditingRepository.save(auditing);
             userRepository.save(user);
             fileRepository.save(f);
         }
-
     }
-
 }

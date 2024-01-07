@@ -68,7 +68,5 @@ public class File {
     )
     private User checkin;
 
-    @OneToMany(mappedBy = "file")
-    private List<Auditing> logs;
 
 }

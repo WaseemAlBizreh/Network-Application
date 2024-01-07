@@ -26,11 +26,15 @@ public class AuthServiceImp implements AuthService {
 
         User user = userRepository.findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseException(404, "User Not Found"));
-
+            if (user.getFaultCount()>=3)
+                throw new ResponseException(403,"your account is blocked");
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            user.setFaultCount(user.getFaultCount()+1);
+            userRepository.save(user);
             throw new ResponseException(422, "Wrong Password");
         }
-
+        user.setFaultCount(0);
+        userRepository.save(user);
         // Generate a JWT token
         String token = jwtService.generateToken(user);
         UserDTOResponse response = new UserDTOResponse(user);
@@ -51,6 +55,7 @@ public class AuthServiceImp implements AuthService {
         User user = User.builder()
                 .username(userRequest.getUsername())
                 .password(passwordEncoder.encode(userRequest.getPassword()))
+                .faultCount(0)
                 .build();
         userRepository.save(user);
         UserDTOResponse response = new UserDTOResponse(user);
