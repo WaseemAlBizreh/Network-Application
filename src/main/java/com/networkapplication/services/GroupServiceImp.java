@@ -113,11 +113,12 @@ public class GroupServiceImp implements GroupService {
             if (admin.getId().equals(deleteDTOUser.getUserId()))
                 throw new ResponseException(403, "can't delete yourself");
             if (group.getMembers().contains(user)) {
-                for (int i = 0; i <user.getMyFiles().size() ; i++) {
+                for (int i = 0; i <group.getFile().size() ; i++) {
                    File file= user.getMyFiles().get(i);
+                   if (file.getCheckin().equals(user)){
                    file.setCheckin(null);
+                   user.getMyFiles().remove(file);}
                    fileRepository.save(file);
-
                 }
                 group.getMembers().remove(user);
                 groupRepository.save(group);
@@ -143,6 +144,14 @@ public class GroupServiceImp implements GroupService {
         if (!group.getMembers().contains(user))
             throw new ResponseException(403,
                     "you are not a member in this group");
+        for (int i = 0; i <group.getFile().size() ; i++) {
+            File file= user.getMyFiles().get(i);
+            if (file.getCheckin().equals(user)){
+                file.setCheckin(null);
+                user.getMyFiles().remove(file);}
+            fileRepository.save(file);
+
+        }
         group.getMembers().remove(user);
         user.getGroups().remove(group);
         userRepository.save(user);
@@ -162,8 +171,8 @@ public class GroupServiceImp implements GroupService {
         for (Group group :
                 user.getGroups()) {
             userDTOGroups.add(new UserGroupsDTOResponse(group));
-            listUserGroupsDTOResponse.setUserGroupsDTOResponses(userDTOGroups);
         }
+        listUserGroupsDTOResponse.setUserGroupsDTOResponses(userDTOGroups);
         return listUserGroupsDTOResponse;
     }
 
@@ -202,8 +211,9 @@ public class GroupServiceImp implements GroupService {
 
         for (Group group : user.getUserGroups()) {
             userDTOGroups.add(new UserGroupsDTOResponse(group));
-            listUserGroupsDTOResponse.setUserGroupsDTOResponses(userDTOGroups);
+
         }
+        listUserGroupsDTOResponse.setUserGroupsDTOResponses(userDTOGroups);
         return listUserGroupsDTOResponse;
     }
 

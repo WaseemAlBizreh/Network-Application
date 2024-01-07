@@ -38,13 +38,10 @@ public class Log {
              ) {
             File f = fileRepository.findById(file).orElseThrow(() ->
                     new ResponseException(404, "File Not Found"));
-            Auditing auditing= Auditing.builder().user(user).operation("checkin").file(f).date(LocalDate.now()).build();
+            Auditing auditing= Auditing.builder().user(user).operation("checkin").fileID(f.getId()).date(LocalDate.now()).build();
             if (user.getLogs()==null)
                 user.setLogs(List.of(auditing));
             else user.getLogs().add(auditing);
-            if (f.getLogs()==null)
-                f.setLogs(List.of(auditing));
-            else f.getLogs().add(auditing);
             auditingRepository.save(auditing);
             userRepository.save(user);
             fileRepository.save(f);
@@ -61,13 +58,11 @@ public class Log {
         ) {
             File f = fileRepository.findById(file).orElseThrow(() ->
                     new ResponseException(404, "File Not Found"));
-            Auditing auditing= Auditing.builder().user(user).operation("checkout").file(f).date(LocalDate.now()).build();
+            Auditing auditing= Auditing.builder().user(user).operation("checkout").fileID(f.getId()).date(LocalDate.now()).build();
             if (user.getLogs()==null)
                 user.setLogs(List.of(auditing));
             else user.getLogs().add(auditing);
-            if (f.getLogs()==null)
-                f.setLogs(List.of(auditing));
-            else f.getLogs().add(auditing);
+
             auditingRepository.save(auditing);
             userRepository.save(user);
             fileRepository.save(f);

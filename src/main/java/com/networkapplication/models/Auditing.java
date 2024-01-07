@@ -36,12 +36,8 @@ public class Auditing {
     )
     User user;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "fileID",
-            foreignKey = @ForeignKey(name = "log_fileID")
-    )
-    File file;
+
+    Long fileID;
 
 
 }

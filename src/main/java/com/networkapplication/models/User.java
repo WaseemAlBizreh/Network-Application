@@ -76,10 +76,10 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Auditing> logs;
-
-    @CreatedDate
-    private LocalDateTime CreatedDate;
-
+    @Column(
+            name = "fault_count"
+    )
+    private Integer faultCount;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
