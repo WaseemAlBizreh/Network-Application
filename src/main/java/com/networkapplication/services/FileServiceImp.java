@@ -15,6 +15,7 @@ import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -23,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -30,6 +32,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +46,8 @@ public class FileServiceImp implements FileService {
     private final GroupRepository groupRepository;
     private final FileRepository fileRepository;
     private final Utils utils;
+    private final ExecutorService executor=Executors.newSingleThreadExecutor();
+
 
     @Override
     public MessageDTO deleteAllFilesInGroup(Long group_id) throws ResponseException {
@@ -205,7 +213,7 @@ public class FileServiceImp implements FileService {
                     throw new ResponseException(403, file.getFileName() + " is CheckIN");
                 }
             } else {
-              return MessageDTO.builder().message("you are not found in group").build();
+                return MessageDTO.builder().message("you are not found in group").build();
             }
         }
         if (user.getMyFiles() == null) {
@@ -213,12 +221,24 @@ public class FileServiceImp implements FileService {
         }
         for (int j = 0; j < checkIn.getFile_id().size(); j++) {
             File file = fileRepository.findById(checkIn.getFile_id().get(j)).orElseThrow();
-            file.setCheckin(user);
-            user.getMyFiles().add(file);
-            fileRepository.save(file);
-            userRepository.save(user);
+            executor.submit(new Runnable(){
+
+                @Override
+                public void run() {
+                    if (file.getCheckin() == null) {
+                        System.out.println("AAsAAA");
+                        file.setCheckin(user);
+                        user.getMyFiles().add(file);
+                        fileRepository.save(file);
+                        userRepository.save(user);
+                    } else {
+                        System.out.println("AAAAA");
+                    }
+                }
+            });
+
             Timer timer = new Timer("FileCheckInTimer");
-            long delayInMillis = 3 * 60 * 60 * 1000; // تعديل الوقت حسب الحاجة (3 أيام)
+            long delayInMillis = 3 * 60 * 60 * 1000;
 
             timer.schedule(new TimerTask() {
                 @Override
@@ -232,7 +252,61 @@ public class FileServiceImp implements FileService {
 
         return MessageDTO.builder().message("CheckIn Success").build();
     }
-
+//    @Override
+//    public  MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
+//        User user = utils.getCurrentUser();
+//        if (checkIn.getFile_id() == null) {
+//            checkIn.setFile_id(List.of());
+//        }
+//        // Execute the transaction
+//        return transactionTemplate.execute(status -> {
+//            try {
+//                System.out.println("AAAAAAAAAAAA");
+//                for (int i = 0; i < checkIn.getFile_id().size(); i++) {
+//
+//                    File file = fileRepository.findById(checkIn.getFile_id().get(i)).orElseThrow(() ->
+//                            new ResponseException(404, "File Not Found"));
+//                    if (file.getGroupFiles().getMembers().contains(user)) {
+//                        if (file.getCheckin() != null) {
+//                            throw new ResponseException(403, file.getFileName() + " is CheckIN");
+//                        }
+//                    } else {
+//                        return MessageDTO.builder().message("you are not found in group").build();
+//                    }
+//                }
+//                if (user.getMyFiles() == null) {
+//                    user.setMyFiles(List.of());
+//                }
+//                for (int j = 0; j < checkIn.getFile_id().size(); j++) {
+//                    File file = fileRepository.findById(checkIn.getFile_id().get(j)).orElseThrow();
+//                    file.setCheckin(user);
+//                    user.getMyFiles().add(file);
+//                    fileRepository.save(file);
+//                    userRepository.save(user);
+//                    Timer timer = new Timer("FileCheckInTimer");
+//                    long delayInMillis = 3 * 60 * 60 * 1000; // تعديل الوقت حسب الحاجة (3 أيام)
+//
+//                    timer.schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            file.setCheckin(null);
+//                            fileRepository.save(file);
+//                            userRepository.save(user);
+//                        }
+//                    }, new Date(System.currentTimeMillis() + delayInMillis));
+//                }
+//
+//                return MessageDTO.builder().message("CheckIn Success").build();
+//            } catch (ResponseException e) {
+//                System.out.println("AAAAAAAAAAAA");
+//                status.setRollbackOnly();
+//
+//                System.out.println(e.toString());
+//                return null;
+//            }
+//        }
+//        );
+//    }
     @Override
     public MessageDTO checkOut(CheckInDTO checkOut) throws ResponseException {
         User user = utils.getCurrentUser();
