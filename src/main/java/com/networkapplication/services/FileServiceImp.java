@@ -72,7 +72,6 @@ public class FileServiceImp implements FileService {
                         status = true;
                 } else
                     status = false;
-                System.out.println(status);
                 filesDTOGroupResponses.add(new GroupFilesDTOResponse(file, status));
             }
             listGroupFilesDTO.setGroupFilesDTOResponses(filesDTOGroupResponses);
