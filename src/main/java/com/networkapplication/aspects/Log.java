@@ -40,7 +40,7 @@ public class Log {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
 
-//File logs
+    //File logs
     //create
     //TODO:make logCreateFile
     //checkin
@@ -64,13 +64,14 @@ public class Log {
             userRepository.save(user);
         }
     }
+
     //fail:
-    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.checkIn(..)) && args(checkIn)",returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.checkIn(..)) && args(checkIn)", returning = "result")
     public void logCheckIn(CheckInDTO checkIn, ResponseEntity<MainDTO> result) {
 
-        if(!result.getStatusCode().is2xxSuccessful()){
-            String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
-            String name2=name.substring(1,name.length()-1);
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
             User user = utils.getCurrentUser();
             List<Long> files = checkIn.getFile_id();
             for (Long file : files) {
@@ -82,7 +83,7 @@ public class Log {
                         .affectedID(file)
                         .build();
                 if (user.getLogs() == null) user.setLogs(List.of(auditing));
-                else{
+                else {
                     user.getLogs().add(auditing);
                 }
                 auditingRepository.save(auditing);
@@ -162,12 +163,13 @@ public class Log {
         auditingRepository.save(auditing);
         userRepository.save(user);
     }
+
     //fail:
-    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.deleteGroup(..)) && args(groupId)",returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.deleteGroup(..)) && args(groupId)", returning = "result")
     public void logDeleteGroupFault(Long groupId, ResponseEntity<MainDTO> result) {
-        if(!result.getStatusCode().is2xxSuccessful()){
-            String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
-            String name2=name.substring(1,name.length()-1);
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
             User user = utils.getCurrentUser();
             Auditing auditing = Auditing.builder()
                     .user(user)
@@ -177,39 +179,41 @@ public class Log {
                     .result(name2)
                     .build();
             if (user.getLogs() == null) user.setLogs(List.of(auditing));
-            else{
+            else {
                 user.getLogs().add(auditing);
             }
             auditingRepository.save(auditing);
             userRepository.save(user);
         }
     }
+
     //addUser
     //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.addUser(..)) && args(request)", returning = "result")
-    public void logAddUserToGroup(JoinPoint joinPoint, Object result, AddUserToGroupRequest request){
-       Optional <User> user1 = userRepository.findById(request.getUser_id());
-       if (user1.isPresent()){
-           User user=user1.get();
-        Auditing auditing = Auditing.builder().user(user).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).result("success").build();
-        if (user.getLogs() == null) user.setLogs(List.of(auditing));
-        else user.getLogs().add(auditing);
-        auditingRepository.save(auditing);
-        userRepository.save(user);}
-       else {
-           Auditing auditing = Auditing.builder().user(null).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).result("success").build();
-           auditingRepository.save(auditing);
-       }
+    public void logAddUserToGroup(JoinPoint joinPoint, Object result, AddUserToGroupRequest request) {
+        Optional<User> user1 = userRepository.findById(request.getUser_id());
+        if (user1.isPresent()) {
+            User user = user1.get();
+            Auditing auditing = Auditing.builder().user(user).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).result("success").build();
+            if (user.getLogs() == null) user.setLogs(List.of(auditing));
+            else user.getLogs().add(auditing);
+            auditingRepository.save(auditing);
+            userRepository.save(user);
+        } else {
+            Auditing auditing = Auditing.builder().user(null).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).result("success").build();
+            auditingRepository.save(auditing);
+        }
     }
+
     //fail:
-    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.addUser(..)) && args(request)",returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.addUser(..)) && args(request)", returning = "result")
     public void logAddUserToGroupFault(AddUserToGroupRequest request, ResponseEntity<MainDTO> result) {
-        if(!result.getStatusCode().is2xxSuccessful()){
-            String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
-            String name2=name.substring(1,name.length()-1);
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
             Optional<User> user1 = userRepository.findById(request.getUser_id());
-            if (user1.isPresent()){
-                User user=user1.get();
+            if (user1.isPresent()) {
+                User user = user1.get();
                 Auditing auditing = Auditing.builder()
                         .user(user)
                         .operation("GroupDelete")
@@ -218,12 +222,12 @@ public class Log {
                         .result(name2)
                         .build();
                 if (user.getLogs() == null) user.setLogs(List.of(auditing));
-                else{
+                else {
                     user.getLogs().add(auditing);
                 }
                 auditingRepository.save(auditing);
-                userRepository.save(user);}
-            else {
+                userRepository.save(user);
+            } else {
 
                 Auditing auditing = Auditing.builder()
                         .user(null)
@@ -233,11 +237,13 @@ public class Log {
                         .result(name2)
                         .build();
                 auditingRepository.save(auditing);
-            }}
+            }
+        }
 
     }
 
     //deleteUser
+    //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.deleteUser(..)) && args(deleteDTOUser)", returning = "result")
     public void logDeleteUserFromGroup(JoinPoint joinPoint, Object result, DeleteDTOUser deleteDTOUser) throws ResponseException {
 
@@ -249,22 +255,83 @@ public class Log {
         auditingRepository.save(auditing);
         userRepository.save(user);
     }
+    //fail:
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.deleteGroup(..)) && args(deleteDTOUser)", returning = "result")
+    public void logDeleteUserFromGroupFault(DeleteDTOUser deleteDTOUser, ResponseEntity<MainDTO> result) {
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
+            Optional<User> user1 = userRepository.findById(deleteDTOUser.getUserId());
+            if (user1.isPresent()) {
+                User user = user1.get();
+                Auditing auditing = Auditing.builder()
+                        .user(user)
+                        .operation("GroupDelete")
+                        .date(LocalDate.now())
+                        .affectedID(deleteDTOUser.getGroupId())
+                        .result(name2)
+                        .build();
+                if (user.getLogs() == null) user.setLogs(List.of(auditing));
+                else {
+                    user.getLogs().add(auditing);
+                }
+                auditingRepository.save(auditing);
+                userRepository.save(user);
+            } else {
+
+                Auditing auditing = Auditing.builder()
+                        .user(null)
+                        .operation("GroupDelete")
+                        .date(LocalDate.now())
+                        .affectedID(deleteDTOUser.getGroupId())
+                        .result(name2)
+                        .build();
+                auditingRepository.save(auditing);
+            }
+        }
+
+    }
+
     //leaveGroup
+    //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.leaveGroup(..)) && args(group_id)", returning = "result")
     public void logUserLeaveGroup(JoinPoint joinPoint, Object result, Long group_id) throws ResponseException {
-        User user =utils.getCurrentUser();
+        User user = utils.getCurrentUser();
         Auditing auditing = Auditing.builder().user(user).operation("LeaveGroup").affectedID(group_id).date(LocalDate.now()).result("success").build();
         if (user.getLogs() == null) user.setLogs(List.of(auditing));
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
         userRepository.save(user);
     }
+    //fail:
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.leaveGroup(..)) && args(groupId)", returning = "result")
+    public void logUserLeaveGroupFault(Long groupId, ResponseEntity<MainDTO> result) {
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
+            User user = utils.getCurrentUser();
+            Auditing auditing = Auditing.builder()
+                    .user(user)
+                    .operation("GroupDelete")
+                    .date(LocalDate.now())
+                    .affectedID(groupId)
+                    .result(name2)
+                    .build();
+            if (user.getLogs() == null) user.setLogs(List.of(auditing));
+            else {
+                user.getLogs().add(auditing);
+            }
+            auditingRepository.save(auditing);
+            userRepository.save(user);
 
-   //THROW
-
-
+        }
 
     }
+
+    //THROW
+
+
+}
 
 
 
