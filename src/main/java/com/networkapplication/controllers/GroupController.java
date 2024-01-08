@@ -27,7 +27,6 @@ public class GroupController {
         }
     }
 
-
     @DeleteMapping("/deleteGroup/{groupId}")
     public ResponseEntity<MainDTO> deleteGroup(@PathVariable Long groupId) {
         try {

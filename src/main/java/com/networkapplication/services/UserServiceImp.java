@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -54,9 +55,14 @@ public class UserServiceImp implements UserService {
         if (admin.getRole().equals(Utils.role.User))
             throw new ResponseException(403,"you are not admin");
         List<User> users = userRepository.findAll();
-        System.out.println("eeeeeee");
+        List<User> notAdmins=new ArrayList<>();
+        for (User user:users
+             ) {
+            if (user.getRole().equals(Utils.role.User))
+                notAdmins.add(user);
+        }
         UsersSearchDTO response = new UsersSearchDTO();
-        response.setUsers(users);
+        response.setUsers(notAdmins);
 
         return response;
     }
