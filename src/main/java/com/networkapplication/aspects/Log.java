@@ -204,7 +204,7 @@ public class Log {
     //create
     //??
     //delete
-
+    //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.deleteGroup(..)) && args(id)", returning = "result")
     public void logDeleteGroup(JoinPoint joinPoint, Object result, Long id) throws ResponseException {
         User user = utils.getCurrentUser();
@@ -214,17 +214,81 @@ public class Log {
         auditingRepository.save(auditing);
         userRepository.save(user);
     }
+    //fail:
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.deleteGroup(..)) && args(groupId)",returning = "result")
+    public void logDeleteGroupFault(Long groupId, ResponseEntity<MainDTO> result) {
+        if(!result.getStatusCode().is2xxSuccessful()){
+            String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
+            String name2=name.substring(1,name.length()-1);
+            User user = utils.getCurrentUser();
+            Auditing auditing = Auditing.builder()
+                    .user(user)
+                    .operation("GroupDelete")
+                    .date(LocalDate.now())
+                    .affectedID(groupId)
+                    .result(name2)
+                    .build();
+            if (user.getLogs() == null) user.setLogs(List.of(auditing));
+            else{
+                user.getLogs().add(auditing);
+            }
+            auditingRepository.save(auditing);
+            userRepository.save(user);
+        }
+    }
     //addUser
+    //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.addUser(..)) && args(request)", returning = "result")
-    public void logAddUserToGroup(JoinPoint joinPoint, Object result, AddUserToGroupRequest request) throws ResponseException {
-        User user = userRepository.findById(request.getUser_id())
-                .orElseThrow(() -> new ResponseException(404, "No User Found"));
+    public void logAddUserToGroup(JoinPoint joinPoint, Object result, AddUserToGroupRequest request){
+       Optional <User> user1 = userRepository.findById(request.getUser_id());
+       if (user1.isPresent()){
+           User user=user1.get();
         Auditing auditing = Auditing.builder().user(user).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).result("success").build();
         if (user.getLogs() == null) user.setLogs(List.of(auditing));
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
-        userRepository.save(user);
+        userRepository.save(user);}
+       else {
+           Auditing auditing = Auditing.builder().user(null).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).result("success").build();
+           auditingRepository.save(auditing);
+       }
     }
+    //fail:
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.addUser(..)) && args(request)",returning = "result")
+    public void logAddUserToGroupFault(AddUserToGroupRequest request, ResponseEntity<MainDTO> result) {
+        if(!result.getStatusCode().is2xxSuccessful()){
+            String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
+            String name2=name.substring(1,name.length()-1);
+            Optional<User> user1 = userRepository.findById(request.getUser_id());
+            if (user1.isPresent()){
+                User user=user1.get();
+                Auditing auditing = Auditing.builder()
+                        .user(user)
+                        .operation("GroupDelete")
+                        .date(LocalDate.now())
+                        .affectedID(request.getGroup_id())
+                        .result(name2)
+                        .build();
+                if (user.getLogs() == null) user.setLogs(List.of(auditing));
+                else{
+                    user.getLogs().add(auditing);
+                }
+                auditingRepository.save(auditing);
+                userRepository.save(user);}
+            else {
+
+                Auditing auditing = Auditing.builder()
+                        .user(null)
+                        .operation("GroupDelete")
+                        .date(LocalDate.now())
+                        .affectedID(request.getGroup_id())
+                        .result(name2)
+                        .build();
+                auditingRepository.save(auditing);
+            }}
+
+    }
+
     //deleteUser
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.deleteUser(..)) && args(deleteDTOUser)", returning = "result")
     public void logDeleteUserFromGroup(JoinPoint joinPoint, Object result, DeleteDTOUser deleteDTOUser) throws ResponseException {
