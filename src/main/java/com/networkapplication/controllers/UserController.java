@@ -29,4 +29,21 @@ public class UserController {
             return exceptionHandler.handleException(ex);
         }
     }
+    @GetMapping("/getAllUsers")
+    public ResponseEntity<MainDTO> getAllUsers() {
+        try {
+            return ResponseEntity.ok(userService.getUsers());
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+
+    @GetMapping("/getUserLogs/{user_id}")
+    public ResponseEntity<MainDTO> getUserLogs(@PathVariable Long user_id) {
+        try {
+            return ResponseEntity.ok(userService.getUserLogs(user_id));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
 }

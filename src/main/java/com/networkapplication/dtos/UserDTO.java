@@ -1,6 +1,7 @@
 package com.networkapplication.dtos;
 
 import com.networkapplication.models.User;
+import com.networkapplication.services.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,9 +22,12 @@ public class UserDTO implements MainDTO {
     private List<String> files = new ArrayList<>();
     private List<String> my_files = new ArrayList<>();
 
+    private Utils.role role;
+
     public UserDTO(User user) {
         user_id = user.getId();
         user_name = user.getUsername();
+        role=user.getRole();
         if (user.getUserGroups() != null)
             for (int i = 0; i < user.getUserGroups().size(); i++) {
                 user_groups.add(user.getUserGroups().get(i).getGroupName());

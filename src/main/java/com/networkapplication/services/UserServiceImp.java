@@ -1,7 +1,9 @@
 package com.networkapplication.services;
 
+import com.networkapplication.dtos.Request.LogDTOs;
 import com.networkapplication.dtos.Response.UsersSearchDTO;
 import com.networkapplication.exceptions.ResponseException;
+import com.networkapplication.models.Auditing;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.GroupRepository;
@@ -16,7 +18,7 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService {
-
+    private final Utils utils;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
 
@@ -44,6 +46,33 @@ public class UserServiceImp implements UserService {
         UsersSearchDTO response = new UsersSearchDTO();
         response.setUsers(users);
         return response;
+    }
+
+    @Override
+    public UsersSearchDTO getUsers() throws ResponseException {
+        User admin=utils.getCurrentUser();
+        if (admin.getRole().equals(Utils.role.User))
+            throw new ResponseException(403,"you are not admin");
+        List<User> users = userRepository.findAll();
+
+        UsersSearchDTO response = new UsersSearchDTO();
+        response.setUsers(users);
+        return response;
+    }
+
+    @Override
+    public LogDTOs getUserLogs(Long userId)throws ResponseException{
+        User admin=utils.getCurrentUser();
+        if (admin.getRole().equals(Utils.role.User))
+            throw new ResponseException(403,"you are not admin");
+        User user=userRepository.findById(userId).orElseThrow(
+                () -> new ResponseException(404, "User Not Found"));
+        List < Auditing > Logs;
+        if (user.getLogs()!=null)
+                 Logs=user.getLogs();
+        else Logs=List.of();
+        return new LogDTOs(Logs);
+
     }
 }
 

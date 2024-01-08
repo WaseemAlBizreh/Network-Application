@@ -116,6 +116,7 @@ public class Log {
     //create
     //??
     //delete
+
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.deleteGroup(..)) && args(id)", returning = "result")
     public void logDeleteGroup(JoinPoint joinPoint, Object result, Long id) throws ResponseException {
         User user = utils.getCurrentUser();
