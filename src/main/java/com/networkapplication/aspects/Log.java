@@ -2,6 +2,8 @@ package com.networkapplication.aspects;
 
 import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.Request.*;
+import com.networkapplication.dtos.Response.CreateFileDTOResponse;
+import com.networkapplication.dtos.Response.GroupDTOResponse;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.Auditing;
 import com.networkapplication.models.File;
@@ -12,15 +14,12 @@ import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import com.networkapplication.services.Utils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -38,8 +37,36 @@ public class Log {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
 
-//File logs
+    //File logs
     //create
+    //success
+    @AfterReturning(pointcut = "execution(* com.networkapplication.services.FileService.createFile(..)) && args(file,group_id)", returning = "result")
+    public void logCreateFile(MultipartFile file, Long group_id, CreateFileDTOResponse result) throws ResponseException {
+        User user = utils.getCurrentUser();
+        Auditing auditing = Auditing.builder().user(user).operation("CreateFile").affectedID(result.getId()).date(LocalDate.now()).result("success").build();
+        if (user.getLogs() == null) user.setLogs(List.of(auditing));
+        else user.getLogs().add(auditing);
+        auditingRepository.save(auditing);
+        userRepository.save(user);
+
+    }
+
+    //fail:
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.createFile(..)) && args(file,group_id)", returning = "result")
+    public void logCreateFileFault(MultipartFile file, Long group_id, ResponseEntity<MainDTO> result) throws ResponseException {
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
+            User user = utils.getCurrentUser();
+            Auditing auditing = Auditing.builder().user(user).operation("CreateFile").affectedID(group_id).date(LocalDate.now()).result(name2).build();
+            if (user.getLogs() == null) user.setLogs(List.of(auditing));
+            else user.getLogs().add(auditing);
+            auditingRepository.save(auditing);
+            userRepository.save(user);
+        }
+
+    }
+
     //TODO:make logCreateFile
     //checkIn
     // success:
@@ -134,8 +161,30 @@ public class Log {
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
         userRepository.save(user);
+    }
 
+    //fail
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.updateFile(..)) && args(file1,group_id)", returning = "result")
+    public void logUpdateFileFault(JoinPoint joinPoint,  MultipartFile file1,Long group_id, ResponseEntity<MainDTO> result) {
 
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
+            User user = utils.getCurrentUser();
+            Optional<File> file = fileRepository.findFileByUsername(file1.getOriginalFilename()+group_id);
+            Long id;
+            if (file.isPresent()){
+                id=file.get().getId();
+            }else id=group_id;
+            Auditing auditing = Auditing.builder().user(user).operation("FileDelete").date(LocalDate.now()).affectedID(id).result(name2).build();
+            if (user.getLogs() == null) user.setLogs(List.of(auditing));
+            else {
+                user.getLogs().add(auditing);
+            }
+            auditingRepository.save(auditing);
+            userRepository.save(user);
+
+        }
     }
 
     //delete
@@ -177,8 +226,38 @@ public class Log {
     }
 
 
-//Group logs
+    //Group logs
     //create
+    //success
+    @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.addGroup(..)) && args(request)", returning = "result")
+    public void logAddGroup(JoinPoint joinPoint, GroupDTORequest request,GroupDTOResponse result ) {
+
+        User user = utils.getCurrentUser();
+        Auditing auditing = Auditing.builder().user(user).operation("AddGroup").affectedID(result.getGroup_id()).date(LocalDate.now()).result("success").build();
+        if (user.getLogs() == null) user.setLogs(List.of(auditing));
+        else user.getLogs().add(auditing);
+        auditingRepository.save(auditing);
+        userRepository.save(user);
+
+    }
+
+    //fail
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.addGroup(..)) && args(request)", returning = "result")
+    public void logAddGroupFault(JoinPoint joinPoint, GroupDTORequest request, ResponseEntity<MainDTO> result) {
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
+            User user = utils.getCurrentUser();
+            Auditing auditing = Auditing.builder().user(user).operation("AddGroup").date(LocalDate.now()).affectedID(0L).result(name2).build();
+            if (user.getLogs() == null) user.setLogs(List.of(auditing));
+            else {
+                user.getLogs().add(auditing);
+            }
+            auditingRepository.save(auditing);
+            userRepository.save(user);
+        }
+    }
+
 
     //??
 
@@ -268,7 +347,7 @@ public class Log {
     }
 
     //fail:
-    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.deleteGroup(..)) && args(deleteDTOUser)", returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.deleteUser(..)) && args(deleteDTOUser)", returning = "result")
     public void logDeleteUserFromGroupFault(DeleteDTOUser deleteDTOUser, ResponseEntity<MainDTO> result) {
         if (!result.getStatusCode().is2xxSuccessful()) {
             String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
@@ -326,22 +405,22 @@ public class Log {
     //THROW
 
 
-//    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.deleteAllFiles(..)) && args(groupId)", returning = "result")
-//    public void deleteAllFilesInGroupFault(Long groupId, ResponseEntity<MainDTO> result) {
-//
-//        if (!result.getStatusCode().is2xxSuccessful()) {
-//            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
-//            String name2 = name.substring(1, name.length() - 1);
-//            User user = utils.getCurrentUser();
-//            Auditing auditing = Auditing.builder().user(user).operation("deleteFile").date(LocalDate.now()).affectedID(groupId).result(name2).build();
-//            if (user.getLogs() == null) user.setLogs(List.of(auditing));
-//            else {
-//                user.getLogs().add(auditing);
-//            }
-//            auditingRepository.save(auditing);
-//            userRepository.save(user);
-//        }
-//    }
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.deleteAllFiles(..)) && args(groupId)", returning = "result")
+    public void deleteAllFilesInGroupFault(Long groupId, ResponseEntity<MainDTO> result) {
+
+        if (!result.getStatusCode().is2xxSuccessful()) {
+            String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
+            String name2 = name.substring(1, name.length() - 1);
+            User user = utils.getCurrentUser();
+            Auditing auditing = Auditing.builder().user(user).operation("deleteAllFile").date(LocalDate.now()).affectedID(groupId).result(name2).build();
+            if (user.getLogs() == null) user.setLogs(List.of(auditing));
+            else {
+                user.getLogs().add(auditing);
+            }
+            auditingRepository.save(auditing);
+            userRepository.save(user);
+        }
+    }
 
 
     @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.AuthController.login(..)) && args(user)", returning = "result")

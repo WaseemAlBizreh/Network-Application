@@ -47,6 +47,15 @@ public class AuthController {
         }
     }
 
+//    @PostMapping("/log")
+//    public ResponseEntity<MainDTO>regis(@RequestBody UserDTORequest user) throws ResponseException {
+//        for (int i = 0; i < 4000; i++) {
+//            user.setUsername(user.getUsername()+i);
+//           services.register(user);
+//        }
+//        return null;
+//    }
+
 
 }
 

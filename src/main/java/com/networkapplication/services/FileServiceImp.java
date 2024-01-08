@@ -311,7 +311,7 @@ public class FileServiceImp implements FileService {
                 }
             }
         } else {
-            return MessageDTO.builder().message("You are not in the group").build();
+            throw new ResponseException(403,"You are not in the group");
         }
         return MessageDTO.builder().message("Files Deleted Successfully").build();
     }

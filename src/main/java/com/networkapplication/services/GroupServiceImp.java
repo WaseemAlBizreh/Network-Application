@@ -127,7 +127,7 @@ public class GroupServiceImp implements GroupService {
                 userRepository.save(user);
                 return MessageDTO.builder().message("User Deleted Successfully").build();
             } else
-                return MessageDTO.builder().message("User Not Found").build();
+               throw new ResponseException(404,"User Not Found");
         } else throw new ResponseException(404, "UnAuthorized");
 
     }
