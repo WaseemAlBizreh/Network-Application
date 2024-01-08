@@ -26,6 +26,7 @@ public class Auditing {
     private Long id;
 
     private LocalDate date;
+
     private String operation;
 
 
@@ -35,7 +36,6 @@ public class Auditing {
             foreignKey = @ForeignKey(name = "log_userID")
     )
     private User user;
-
 
     private Long affectedID;
 

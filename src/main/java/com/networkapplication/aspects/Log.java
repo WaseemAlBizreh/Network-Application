@@ -13,11 +13,14 @@ import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import com.networkapplication.services.Utils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -139,6 +142,7 @@ public class Log {
     //deleteUser
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.deleteUser(..)) && args(deleteDTOUser)", returning = "result")
     public void logDeleteUserFromGroup(JoinPoint joinPoint, Object result, DeleteDTOUser deleteDTOUser) throws ResponseException {
+
         User user = userRepository.findById(deleteDTOUser.getUserId())
                 .orElseThrow(() -> new ResponseException(404, "No User Found"));
         Auditing auditing = Auditing.builder().user(user).operation("DeleteUserFromGroup").affectedID(deleteDTOUser.getGroupId()).date(LocalDate.now()).result("success").build();
@@ -157,6 +161,30 @@ public class Log {
         auditingRepository.save(auditing);
         userRepository.save(user);
     }
+
+   //THROW
+
+   @AfterThrowing(pointcut = "execution(* com.networkapplication.c.FileService.checkIn(..)) && args(checkIn)",throwing = "exception")
+   @Transactional(dontRollbackOn = ResponseException.class)
+   public void logCheckIn(CheckInDTO checkIn,Exception exception)  {
+       User user = utils.getCurrentUser();
+       List<Long> files = checkIn.getFile_id();
+       for (Long file : files) {
+           Auditing auditing = Auditing.builder()
+                   .user(user)
+                   .operation("FileCheckIn")
+                   .date(LocalDate.now())
+                   .result("fail:"+exception.getMessage())
+                   .build();
+           if (user.getLogs() == null) user.setLogs(List.of(auditing));
+           else{
+               user.getLogs().add(auditing);
+           }
+           auditingRepository.save(auditing);
+           userRepository.save(user);
+       }
+   }
+
 
 }
 

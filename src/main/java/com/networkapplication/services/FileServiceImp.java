@@ -202,7 +202,6 @@ public class FileServiceImp implements FileService {
         if (checkIn.getFile_id() == null) {
             checkIn.setFile_id(List.of());
         }
-
         for (int i = 0; i < checkIn.getFile_id().size(); i++) {
             System.out.println(checkIn.getFile_id().get(i));
             Object lock = locks.computeIfAbsent(checkIn.getFile_id().get(i), k -> new Object());
@@ -222,7 +221,6 @@ public class FileServiceImp implements FileService {
                         userRepository.save(user);
                         Timer timer = new Timer("FileCheckInTimer");
                         long delayInMillis = 3 * 60 * 60 * 1000;
-
                         timer.schedule(new TimerTask() {
                             @Override
                             public void run() {
