@@ -34,10 +34,11 @@ public class Auditing {
             name = "userID",
             foreignKey = @ForeignKey(name = "log_userID")
     )
-    User user;
+    private User user;
 
 
-    Long affectedID;
+    private Long affectedID;
 
+    private String result;
 
 }

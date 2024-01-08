@@ -1,5 +1,6 @@
 package com.networkapplication.models;
 
+import com.networkapplication.services.Utils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -67,7 +69,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "ownerFile")
     private List<File> files;
 
-
     @OneToMany(mappedBy = "checkin")
     private List<File> myFiles;
 
@@ -77,6 +78,11 @@ public class User implements UserDetails {
             name = "fault_count"
     )
     private Integer faultCount;
+    @Column(
+            name = "Role"
+    )
+    private Utils.role role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

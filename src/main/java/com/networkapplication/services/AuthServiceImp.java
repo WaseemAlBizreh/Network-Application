@@ -1,12 +1,11 @@
 package com.networkapplication.services;
 
 import com.networkapplication.config.JwtService;
+import com.networkapplication.dtos.Request.AdminRegisterDTO;
 import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.dtos.Response.UserDTOResponse;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.User;
-import com.networkapplication.repositories.FileRepository;
-import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +55,35 @@ public class AuthServiceImp implements AuthService {
                 .username(userRequest.getUsername())
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .faultCount(0)
+                .role(Utils.role.User)
+                .build();
+        userRepository.save(user);
+        UserDTOResponse response = new UserDTOResponse(user);
+
+        response.setToken(jwtService.generateToken(user));
+        return response;
+    }
+
+    @Transactional
+    @Override
+    public UserDTOResponse adminRegister(AdminRegisterDTO adminRequest) throws ResponseException {
+        if (userRepository.findUserByUsername(adminRequest.getUsername()).isPresent())
+            throw new ResponseException(400,
+                    "username is already taken");
+        if (!adminRequest.getConfirm_password().equals(adminRequest.getPassword())) {
+            throw new ResponseException(422,
+                    "Password and Confirm Password Don't Match");
+        }
+        if (!adminRequest.getVerificationCode().equals("SHADOWEN")){
+            throw new ResponseException(422,
+                    "verification code is incorrect");
+
+        }
+        User user = User.builder()
+                .username(adminRequest.getUsername())
+                .password(passwordEncoder.encode(adminRequest.getPassword()))
+                .faultCount(0)
+                .role(Utils.role.Admin)
                 .build();
         userRepository.save(user);
         UserDTOResponse response = new UserDTOResponse(user);

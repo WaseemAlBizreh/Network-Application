@@ -13,6 +13,10 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 @Service
 public class Utils {
+    public enum role{
+        Admin,
+        User
+    }
     @NonNull
     HttpServletRequest Request;
     private final UserRepository userRepository;

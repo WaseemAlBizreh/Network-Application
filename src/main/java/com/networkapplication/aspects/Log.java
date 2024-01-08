@@ -43,7 +43,13 @@ public class Log {
         List<Long> files = checkIn.getFile_id();
         for (Long file : files) {
             File f = fileRepository.findById(file).orElseThrow(() -> new ResponseException(404, "File Not Found"));
-            Auditing auditing = Auditing.builder().user(user).operation("FileCheckIn").affectedID(f.getId()).date(LocalDate.now()).build();
+            Auditing auditing = Auditing.builder()
+                    .user(user)
+                    .operation("FileCheckIn")
+                    .affectedID(f.getId())
+                    .date(LocalDate.now())
+                    .result("success")
+                    .build();
             if (user.getLogs() == null) user.setLogs(List.of(auditing));
             else user.getLogs().add(auditing);
             auditingRepository.save(auditing);
@@ -58,7 +64,7 @@ public class Log {
         List<Long> files = checkOut.getFile_id();
         for (Long file : files) {
             File f = fileRepository.findById(file).orElseThrow(() -> new ResponseException(404, "File Not Found"));
-            Auditing auditing = Auditing.builder().user(user).operation("FileCheckOut").affectedID(f.getId()).date(LocalDate.now()).build();
+            Auditing auditing = Auditing.builder().user(user).operation("FileCheckOut").affectedID(f.getId()).date(LocalDate.now()).result("success").build();
             if (user.getLogs() == null) user.setLogs(List.of(auditing));
             else user.getLogs().add(auditing);
             auditingRepository.save(auditing);
@@ -81,7 +87,7 @@ public class Log {
             break;
         }
         if (id == null) return;
-        Auditing auditing = Auditing.builder().user(user).operation("FileUpdate").affectedID(id).date(LocalDate.now()).build();
+        Auditing auditing = Auditing.builder().user(user).operation("FileUpdate").affectedID(id).date(LocalDate.now()).result("success").build();
         if (user.getLogs() == null) user.setLogs(List.of(auditing));
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
@@ -98,7 +104,7 @@ public class Log {
         ;
         List<Long> files = filesID.getFile_id();
         for (Long file : files) {
-            Auditing auditing = Auditing.builder().user(user).operation("FileDelete").affectedID(file).date(LocalDate.now()).build();
+            Auditing auditing = Auditing.builder().user(user).operation("FileDelete").affectedID(file).date(LocalDate.now()).result("success").build();
             if (user.getLogs() == null) user.setLogs(List.of(auditing));
             else user.getLogs().add(auditing);
             auditingRepository.save(auditing);
@@ -113,7 +119,7 @@ public class Log {
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.deleteGroup(..)) && args(id)", returning = "result")
     public void logDeleteGroup(JoinPoint joinPoint, Object result, Long id) throws ResponseException {
         User user = utils.getCurrentUser();
-        Auditing auditing = Auditing.builder().user(user).operation("GroupDelete").affectedID(id).date(LocalDate.now()).build();
+        Auditing auditing = Auditing.builder().user(user).operation("GroupDelete").affectedID(id).date(LocalDate.now()).result("success").build();
         if (user.getLogs() == null) user.setLogs(List.of(auditing));
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
@@ -124,7 +130,7 @@ public class Log {
     public void logAddUserToGroup(JoinPoint joinPoint, Object result, AddUserToGroupRequest request) throws ResponseException {
         User user = userRepository.findById(request.getUser_id())
                 .orElseThrow(() -> new ResponseException(404, "No User Found"));
-        Auditing auditing = Auditing.builder().user(user).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).build();
+        Auditing auditing = Auditing.builder().user(user).operation("AddUserToGroup").affectedID(request.getGroup_id()).date(LocalDate.now()).result("success").build();
         if (user.getLogs() == null) user.setLogs(List.of(auditing));
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
@@ -135,17 +141,17 @@ public class Log {
     public void logDeleteUserFromGroup(JoinPoint joinPoint, Object result, DeleteDTOUser deleteDTOUser) throws ResponseException {
         User user = userRepository.findById(deleteDTOUser.getUserId())
                 .orElseThrow(() -> new ResponseException(404, "No User Found"));
-        Auditing auditing = Auditing.builder().user(user).operation("DeleteUserFromGroup").affectedID(deleteDTOUser.getGroupId()).date(LocalDate.now()).build();
+        Auditing auditing = Auditing.builder().user(user).operation("DeleteUserFromGroup").affectedID(deleteDTOUser.getGroupId()).date(LocalDate.now()).result("success").build();
         if (user.getLogs() == null) user.setLogs(List.of(auditing));
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
         userRepository.save(user);
     }
     //leaveGroup
-    @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.deleteUser(..)) && args(group_id)", returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.leaveGroup(..)) && args(group_id)", returning = "result")
     public void logUserLeaveGroup(JoinPoint joinPoint, Object result, Long group_id) throws ResponseException {
         User user =utils.getCurrentUser();
-        Auditing auditing = Auditing.builder().user(user).operation("LeaveGroup").affectedID(group_id).date(LocalDate.now()).build();
+        Auditing auditing = Auditing.builder().user(user).operation("LeaveGroup").affectedID(group_id).date(LocalDate.now()).result("success").build();
         if (user.getLogs() == null) user.setLogs(List.of(auditing));
         else user.getLogs().add(auditing);
         auditingRepository.save(auditing);
