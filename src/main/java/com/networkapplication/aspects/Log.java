@@ -41,11 +41,10 @@ public class Log {
 //File logs
     //create
     //TODO:make logCreateFile
-    //checkin
     //checkIn
     // success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.FileService.checkIn(..)) && args(checkIn)", returning = "result")
-    public void logCheckin(JoinPoint joinPoint, Object result, CheckInDTO checkIn) throws ResponseException {
+    public void logCheckIn(JoinPoint joinPoint, Object result, CheckInDTO checkIn) throws ResponseException {
         User user = utils.getCurrentUser();
         List<Long> files = checkIn.getFile_id();
         for (Long file : files) {

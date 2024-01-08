@@ -3,6 +3,7 @@ package com.networkapplication.services;
 import com.networkapplication.FileStorage.FilePath;
 import com.networkapplication.dtos.Request.CheckInDTO;
 import com.networkapplication.dtos.Request.FileName;
+import com.networkapplication.dtos.Response.CreateFileDTOResponse;
 import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
 import com.networkapplication.dtos.Response.ListGroupFilesDTO;
 import com.networkapplication.dtos.Response.MessageDTO;
@@ -87,7 +88,7 @@ public class FileServiceImp implements FileService {
 
     @Transactional(rollbackOn = ResponseException.class)
     @Override
-    public MessageDTO createFile(MultipartFile file, Long group_id) throws IOException, ResponseException {
+    public CreateFileDTOResponse createFile(MultipartFile file, Long group_id) throws IOException, ResponseException {
         User user = utils.getCurrentUser();
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "Group notFound")
@@ -115,7 +116,13 @@ public class FileServiceImp implements FileService {
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
             bufferedOutputStream.write(file.getBytes());
             bufferedOutputStream.close();
-            return MessageDTO.builder().message("file upload").build();
+            File file1 = fileRepository.findFileByUsername(file.getOriginalFilename() + group_id).orElseThrow(
+
+            );
+            CreateFileDTOResponse createFileDTOResponse = new CreateFileDTOResponse();
+            createFileDTOResponse.setMessage("file upload");
+            createFileDTOResponse.setId(file1.getId());
+            return createFileDTOResponse;
         } else {
             throw new ResponseException(403, "you are not a member in this group");
         }
@@ -149,7 +156,6 @@ public class FileServiceImp implements FileService {
                         .headers(headers)
                         .contentType(MediaTypeFactory.getMediaType(resource).orElse(MediaType.ALL))
                         .body(resource);
-
             }
         }
         throw new ResponseException(404, "File Not Found");

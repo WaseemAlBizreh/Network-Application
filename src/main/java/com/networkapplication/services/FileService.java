@@ -1,20 +1,14 @@
 package com.networkapplication.services;
 
 import com.networkapplication.dtos.Request.CheckInDTO;
-import com.networkapplication.dtos.Request.FileDTORequest;
 import com.networkapplication.dtos.Request.FileName;
-import com.networkapplication.dtos.Response.FileDTOResponse;
-import com.networkapplication.dtos.Response.GroupFilesDTOResponse;
-import com.networkapplication.dtos.Response.ListGroupFilesDTO;
-import com.networkapplication.dtos.Response.MessageDTO;
+import com.networkapplication.dtos.Response.*;
 import com.networkapplication.exceptions.ResponseException;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public interface FileService {
 
@@ -23,7 +17,7 @@ public interface FileService {
 
     ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException;
 
-    MessageDTO createFile(MultipartFile file, Long group_id) throws IOException, ResponseException;
+    CreateFileDTOResponse createFile(MultipartFile file, Long group_id) throws IOException, ResponseException;
 
     ResponseEntity<Resource> getFile(Long group_id, FileName file_name) throws ResponseException;
 
