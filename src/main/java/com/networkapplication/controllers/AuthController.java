@@ -1,6 +1,7 @@
 package com.networkapplication.controllers;
 
 import com.networkapplication.dtos.MainDTO;
+import com.networkapplication.dtos.Request.AdminRegisterDTO;
 import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.exceptions.ResponseException;
@@ -36,6 +37,16 @@ public class AuthController {
             return exceptionHandler.handleException(ex);
         }
     }
+
+    @PostMapping("/registerAsAdmin")
+    public ResponseEntity<MainDTO> registerAsAdmin(@RequestBody AdminRegisterDTO admin) {
+        try {
+            return ResponseEntity.ok(services.adminRegister(admin));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+
 
 }
 
