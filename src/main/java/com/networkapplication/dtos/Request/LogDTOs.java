@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
 public class LogDTOs implements MainDTO {
     List<LogDTO>logs;
     public LogDTOs(List <Auditing> auditings){
