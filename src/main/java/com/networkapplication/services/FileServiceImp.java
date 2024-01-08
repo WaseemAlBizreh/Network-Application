@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +41,12 @@ public class FileServiceImp implements FileService {
     private final GroupRepository groupRepository;
     private final FileRepository fileRepository;
     private final Utils utils;
+    private static final ConcurrentHashMap<Long, Object> locks = new ConcurrentHashMap<>();
 
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteAllFilesInGroup(Long group_id) throws ResponseException {
+
         User user = utils.getCurrentUser();
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "No Group Found")
@@ -81,6 +85,7 @@ public class FileServiceImp implements FileService {
         }
     }
 
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO createFile(MultipartFile file, Long group_id) throws IOException, ResponseException {
         User user = utils.getCurrentUser();
@@ -89,15 +94,15 @@ public class FileServiceImp implements FileService {
         );
         if (group.getMembers().contains(user)) {
             for (int i = 0; i < group.getFile().size(); i++) {
-                if (Objects.equals(file.getOriginalFilename()+group_id, group.getFile().get(i).getFileName())) {
+                if (Objects.equals(file.getOriginalFilename() + group_id, group.getFile().get(i).getFileName())) {
                     throw new ResponseException(422, "File Name is already Taken");
                 }
             }
-            if (fileRepository.findFileByUsername(file.getName()+group_id).isPresent()) {
+            if (fileRepository.findFileByUsername(file.getName() + group_id).isPresent()) {
                 throw new ResponseException(401, "The File Name already exists");
             }
             File textFile = File.builder()
-                    .fileName(file.getOriginalFilename()+group_id)
+                    .fileName(file.getOriginalFilename() + group_id)
                     .path(System.getProperty("user.home") + "/Desktop\\Network-Project" + "\\group" + group_id)
                     .groupFiles(group).ownerFile(user)
                     .lastEditDate(LocalDate.now()).build();
@@ -129,7 +134,7 @@ public class FileServiceImp implements FileService {
             throw new ResponseException(401, "unAuthorized");
         }
 
-        File file = fileRepository.findFileByUsername(file_name.getName()+group_id).orElseThrow(
+        File file = fileRepository.findFileByUsername(file_name.getName() + group_id).orElseThrow(
                 () -> new ResponseException(404, "Not Found File")
         );
         java.io.File[] listOfFiles = folder.listFiles();
@@ -165,7 +170,7 @@ public class FileServiceImp implements FileService {
             for (int i = 0; i < group.getFile().size(); i++) {
                 if (group.getFile().get(i).getCheckin() != null) {
                     if (group.getFile().get(i).getCheckin().equals(user) &&
-                            group.getFile().get(i).getFileName().replace(group_id.toString(),"").equals(file1.getOriginalFilename())) {
+                            group.getFile().get(i).getFileName().replace(group_id.toString(), "").equals(file1.getOriginalFilename())) {
                         file = group.getFile().get(i);
                         break;
                     }
@@ -190,48 +195,68 @@ public class FileServiceImp implements FileService {
 
 
     @Override
-    public  MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
+    @Transactional(rollbackOn = ResponseException.class)
+    public MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
+        List<Long> check = new ArrayList<Long>();
         User user = utils.getCurrentUser();
         if (checkIn.getFile_id() == null) {
             checkIn.setFile_id(List.of());
         }
-        for (int i = 0; i < checkIn.getFile_id().size(); i++) {
 
-            File file = fileRepository.findById(checkIn.getFile_id().get(i)).orElseThrow(() ->
-                    new ResponseException(404, "File Not Found"));
-            if (file.getGroupFiles().getMembers().contains(user)) {
-                if (file.getCheckin() != null) {
-                    throw new ResponseException(403, file.getFileName() + " is CheckIN");
+        for (int i = 0; i < checkIn.getFile_id().size(); i++) {
+            System.out.println(checkIn.getFile_id().get(i));
+            Object lock = locks.computeIfAbsent(checkIn.getFile_id().get(i), k -> new Object());
+            synchronized (lock) {
+                File file = fileRepository.findById(checkIn.getFile_id().get(i)).orElseThrow(() ->
+                        new ResponseException(404, "File Not Found"));
+                if (file.getGroupFiles().getMembers().contains(user)) {
+                    if (file.getCheckin() != null) {
+                        check.add(file.getId());
+                    } else {
+                        if (user.getMyFiles() == null) {
+                            user.setMyFiles(List.of());
+                        }
+                        file.setCheckin(user);
+                        user.getMyFiles().add(file);
+                        fileRepository.save(file);
+                        userRepository.save(user);
+                        Timer timer = new Timer("FileCheckInTimer");
+                        long delayInMillis = 3 * 60 * 60 * 1000;
+
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                file.setCheckin(null);
+                                fileRepository.save(file);
+                                userRepository.save(user);
+                            }
+                        }, new Date(System.currentTimeMillis() + delayInMillis));
+                    }
+                } else {
+                    return MessageDTO.builder().message("you are not found in group").build();
                 }
-            } else {
-              return MessageDTO.builder().message("you are not found in group").build();
             }
         }
-        if (user.getMyFiles() == null) {
-            user.setMyFiles(List.of());
-        }
-        for (int j = 0; j < checkIn.getFile_id().size(); j++) {
-            File file = fileRepository.findById(checkIn.getFile_id().get(j)).orElseThrow();
-            file.setCheckin(user);
-            user.getMyFiles().add(file);
-            fileRepository.save(file);
-            userRepository.save(user);
-            Timer timer = new Timer("FileCheckInTimer");
-            long delayInMillis = 3 * 60 * 60 * 1000; // تعديل الوقت حسب الحاجة (3 أيام)
+        if (check.size() != 0) {
+            StringBuilder stringBuilder = new StringBuilder();
 
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    file.setCheckin(null);
-                    fileRepository.save(file);
-                    userRepository.save(user);
+            if (check.size() == 1) {
+                stringBuilder.append("File ");
+                stringBuilder.append(fileRepository.findById(check.get(0)).get().getFileName()).append(" is CheckIn");
+            } else {
+                stringBuilder.append("Files ");
+                for (int j = 0; j < check.size() - 1; j++) {
+                    String name = fileRepository.findById(check.get(j)).get().getFileName();
+                    stringBuilder.append(name).append(" and ");
                 }
-            }, new Date(System.currentTimeMillis() + delayInMillis));
-        }
-
-        return MessageDTO.builder().message("CheckIn Success").build();
+                stringBuilder.append(fileRepository.findById(check.get(check.size() - 1)).get().getFileName()).append(" is CheckIn");
+            }
+            throw new ResponseException(403, stringBuilder.toString());
+        } else
+            return MessageDTO.builder().message("CheckIn Success").build();
     }
 
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO checkOut(CheckInDTO checkOut) throws ResponseException {
         User user = utils.getCurrentUser();
@@ -259,7 +284,7 @@ public class FileServiceImp implements FileService {
         return MessageDTO.builder().message("File Checked Out Successfully").build();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteFile(Long groupId, CheckInDTO filesId) throws ResponseException {
 //      get user or admin
@@ -277,6 +302,8 @@ public class FileServiceImp implements FileService {
                         || user.getId().equals(group.getAdmin().getId()))) {
                     fileRepository.delete(file);
                     userRepository.save(user);
+                } else {
+                    throw new ResponseException(403, "unAuthorized");
                 }
             }
         } else {

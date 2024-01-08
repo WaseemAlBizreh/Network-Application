@@ -1,10 +1,9 @@
 package com.networkapplication;
-
-import com.networkapplication.models.File;
-import com.networkapplication.models.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.util.List;
@@ -12,6 +11,8 @@ import java.util.List;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableAspectJAutoProxy
+@ServletComponentScan
+
 public class NetworkApplication {
 
 

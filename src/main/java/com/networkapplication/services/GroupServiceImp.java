@@ -28,7 +28,7 @@ public class GroupServiceImp implements GroupService {
     private final Utils search;
     private final FileService fileService;
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
         User user = search.getCurrentUser();
@@ -56,7 +56,7 @@ public class GroupServiceImp implements GroupService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteGroup(Long id) throws ResponseException {
         User user = search.getCurrentUser();
@@ -72,7 +72,7 @@ public class GroupServiceImp implements GroupService {
 
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO addUser(AddUserToGroupRequest request) throws ResponseException {
 
@@ -98,7 +98,7 @@ public class GroupServiceImp implements GroupService {
         return MessageDTO.builder().message("user added successfully").build();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteUser(DeleteDTOUser deleteDTOUser) throws ResponseException {
         //get admin
@@ -113,12 +113,14 @@ public class GroupServiceImp implements GroupService {
             if (admin.getId().equals(deleteDTOUser.getUserId()))
                 throw new ResponseException(403, "can't delete yourself");
             if (group.getMembers().contains(user)) {
-                for (int i = 0; i <group.getFile().size() ; i++) {
-                   File file= user.getMyFiles().get(i);
-                   if (file.getCheckin().equals(user)){
-                   file.setCheckin(null);
-                   user.getMyFiles().remove(file);}
-                   fileRepository.save(file);
+                for (int i = 0; i < group.getFile().size(); i++) {
+                    File file = group.getFile().get(i);
+                    if (file.getCheckin() != null)
+                        if (file.getCheckin().equals(user)) {
+                            file.setCheckin(null);
+                            user.getMyFiles().remove(file);
+                            fileRepository.save(file);
+                        }
                 }
                 group.getMembers().remove(user);
                 groupRepository.save(group);
@@ -130,7 +132,7 @@ public class GroupServiceImp implements GroupService {
 
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO leaveGroup(Long group_id) throws ResponseException {
         //get user
@@ -144,13 +146,14 @@ public class GroupServiceImp implements GroupService {
         if (!group.getMembers().contains(user))
             throw new ResponseException(403,
                     "you are not a member in this group");
-        for (int i = 0; i <group.getFile().size() ; i++) {
-            File file= user.getMyFiles().get(i);
-            if (file.getCheckin().equals(user)){
-                file.setCheckin(null);
-                user.getMyFiles().remove(file);}
-            fileRepository.save(file);
-
+        for (int i = 0; i < group.getFile().size(); i++) {
+            File file = group.getFile().get(i);
+            if (file.getCheckin() != null)
+                if (file.getCheckin().equals(user)) {
+                    file.setCheckin(null);
+                    user.getMyFiles().remove(file);
+                    fileRepository.save(file);
+                }
         }
         group.getMembers().remove(user);
         user.getGroups().remove(group);
@@ -206,7 +209,7 @@ public class GroupServiceImp implements GroupService {
         User user = search.getCurrentUser();
         List<UserGroupsDTOResponse> userDTOGroups = new ArrayList<>();
         ListUserGroupsDTOResponse listUserGroupsDTOResponse = new ListUserGroupsDTOResponse();
-        if(user.getUserGroups()==null)
+        if (user.getUserGroups() == null)
             throw new ResponseException(404, "You don't have any group");
 
         for (Group group : user.getUserGroups()) {
