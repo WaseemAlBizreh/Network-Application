@@ -231,7 +231,7 @@ public class FileServiceImp implements FileService {
                         }, new Date(System.currentTimeMillis() + delayInMillis));
                     }
                 } else {
-                    return MessageDTO.builder().message("you are not found in group").build();
+                    throw new ResponseException(404,"you are not found in group");
                 }
             }
         }

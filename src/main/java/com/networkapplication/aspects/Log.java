@@ -1,5 +1,6 @@
 package com.networkapplication.aspects;
 
+import com.networkapplication.dtos.MainDTO;
 import com.networkapplication.dtos.Request.AddUserToGroupRequest;
 import com.networkapplication.dtos.Request.CheckInDTO;
 import com.networkapplication.dtos.Request.DeleteDTOUser;
@@ -19,12 +20,14 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Aspect
 @Component
@@ -165,25 +168,29 @@ public class Log {
 
    //THROW
 
-   @AfterThrowing(pointcut = "execution(* com.networkapplication.c.FileService.checkIn(..)) && args(checkIn)",throwing = "exception")
-   @Transactional(dontRollbackOn = ResponseException.class)
-   public void logCheckIn(CheckInDTO checkIn,Exception exception)  {
-       User user = utils.getCurrentUser();
-       List<Long> files = checkIn.getFile_id();
-       for (Long file : files) {
-           Auditing auditing = Auditing.builder()
-                   .user(user)
-                   .operation("FileCheckIn")
-                   .date(LocalDate.now())
-                   .result("fail:"+exception.getMessage())
-                   .build();
-           if (user.getLogs() == null) user.setLogs(List.of(auditing));
-           else{
-               user.getLogs().add(auditing);
-           }
-           auditingRepository.save(auditing);
-           userRepository.save(user);
-       }
+   @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.checkIn(..)) && args(checkIn)",returning = "result")
+   public void logCheckIn(CheckInDTO checkIn, ResponseEntity<MainDTO> result) {
+
+      if(!result.getStatusCode().is2xxSuccessful()){
+          String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
+          String name2=name.substring(1,name.length()-1);
+          User user = utils.getCurrentUser();
+          List<Long> files = checkIn.getFile_id();
+          for (Long file : files) {
+              Auditing auditing = Auditing.builder()
+                      .user(user)
+                      .operation("FileCheckIn")
+                      .date(LocalDate.now())
+                      .result(name2)
+                      .build();
+              if (user.getLogs() == null) user.setLogs(List.of(auditing));
+              else{
+                  user.getLogs().add(auditing);
+              }
+              auditingRepository.save(auditing);
+              userRepository.save(user);
+          }
+      }
    }
 
 
