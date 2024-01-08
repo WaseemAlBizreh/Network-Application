@@ -408,7 +408,7 @@ public class Log {
     }
 
 
-    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.AuthController.login(..)) && args(user1)",returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.AuthController.login(..)) && args(user)",returning = "result")
     public void logLoginFault(UserDTORequest user, ResponseEntity<MainDTO> result) {
         if(!result.getStatusCode().is2xxSuccessful()){
             String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
@@ -426,7 +426,7 @@ public class Log {
     }
 
 
-    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.AuthController.register(..)) && args(user1)",returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.AuthController.register(..)) && args(user)",returning = "result")
     public void logRegisterFault(UserDTORequest user, ResponseEntity<MainDTO> result) {
         if(!result.getStatusCode().is2xxSuccessful()){
             String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
@@ -444,7 +444,7 @@ public class Log {
     }
 
 
-    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.AuthController.registerAsAdmin(..)) && args(user1)",returning = "result")
+    @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.AuthController.registerAsAdmin(..)) && args(user)",returning = "result")
     public void logRegisterAsAdmin(AdminRegisterDTO user, ResponseEntity<MainDTO> result) {
         if(!result.getStatusCode().is2xxSuccessful()){
             String name= Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO","");
