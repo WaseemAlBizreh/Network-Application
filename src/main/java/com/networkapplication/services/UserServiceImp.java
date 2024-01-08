@@ -54,9 +54,10 @@ public class UserServiceImp implements UserService {
         if (admin.getRole().equals(Utils.role.User))
             throw new ResponseException(403,"you are not admin");
         List<User> users = userRepository.findAll();
-
+        System.out.println("eeeeeee");
         UsersSearchDTO response = new UsersSearchDTO();
         response.setUsers(users);
+
         return response;
     }
 
