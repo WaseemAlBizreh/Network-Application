@@ -83,10 +83,9 @@ public class Log {
             userRepository.save(user);
         }
     }
-    //fail
+    //fail:
     @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.checkIn(..)) && args(checkIn)",returning = "result")
     public void logCheckInFault(CheckInDTO checkIn, ResponseEntity<MainDTO> result) {
-
         if (!result.getStatusCode().is2xxSuccessful()) {
             String name = Objects.requireNonNull(result.getBody()).toString().replace("ErrorDTO", "");
             String name2 = name.substring(1, name.length() - 1);
@@ -106,7 +105,7 @@ public class Log {
 
 
     //checkout
-    //success
+    //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.FileService.checkOut(..)) && args(checkOut)", returning = "result")
     public void logCheckout(JoinPoint joinPoint, Object result, CheckInDTO checkOut) throws ResponseException {
         User user = utils.getCurrentUser();
@@ -121,7 +120,7 @@ public class Log {
         }
     }
 
-    //fail
+    //fail:
     @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.checkOut(..)) && args(checkOut)", returning = "result")
     public void logCheckOutFault(CheckInDTO checkOut, ResponseEntity<MainDTO> result) {
 
@@ -143,6 +142,7 @@ public class Log {
     }
 
     //update
+    //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.FileService.updateFile(..)) && args(group_id,file1)", returning = "result")
     public void logUpdateFile(JoinPoint joinPoint, Object result, Long group_id, MultipartFile file1) throws ResponseException {
         User user = utils.getCurrentUser();
@@ -163,7 +163,7 @@ public class Log {
         userRepository.save(user);
     }
 
-    //fail
+    //fail:
     @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.FileController.updateFile(..)) && args(file1,group_id)", returning = "result")
     public void logUpdateFileFault(JoinPoint joinPoint,  MultipartFile file1,Long group_id, ResponseEntity<MainDTO> result) {
 
@@ -228,7 +228,7 @@ public class Log {
 
     //Group logs
     //create
-    //success
+    //success:
     @AfterReturning(pointcut = "execution(* com.networkapplication.services.GroupService.addGroup(..)) && args(request)", returning = "result")
     public void logAddGroup(JoinPoint joinPoint, GroupDTORequest request,GroupDTOResponse result ) {
 
@@ -241,7 +241,7 @@ public class Log {
 
     }
 
-    //fail
+    //fail:
     @AfterReturning(pointcut = "execution(* com.networkapplication.controllers.GroupController.addGroup(..)) && args(request)", returning = "result")
     public void logAddGroupFault(JoinPoint joinPoint, GroupDTORequest request, ResponseEntity<MainDTO> result) {
         if (!result.getStatusCode().is2xxSuccessful()) {

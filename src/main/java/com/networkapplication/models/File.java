@@ -14,7 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "files")
+@Table(name = "files" ,indexes = {
+        @Index(name = "idx_file_name", columnList = "file_name")
+})
 public class File {
 
     @Id

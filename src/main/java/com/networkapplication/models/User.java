@@ -26,6 +26,9 @@ import java.util.List;
                         name = "username_unique",
                         columnNames = "username"
                 )
+        },
+        indexes = {
+                @Index(name = "idx_user_name", columnList = "username")
         }
 )
 public class User implements UserDetails {

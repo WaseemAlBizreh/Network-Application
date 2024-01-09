@@ -14,6 +14,7 @@ import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -116,8 +117,10 @@ public class GroupServiceImp implements GroupService {
                 for (int i = 0; i < group.getFile().size(); i++) {
                     File file = group.getFile().get(i);
                     if (file.getCheckin() != null)
+
                         if (file.getCheckin().equals(user)) {
                             file.setCheckin(null);
+                            if(file.getOwnerFile().equals(user))
                             user.getMyFiles().remove(file);
                             fileRepository.save(file);
                         }
@@ -151,6 +154,7 @@ public class GroupServiceImp implements GroupService {
             if (file.getCheckin() != null)
                 if (file.getCheckin().equals(user)) {
                     file.setCheckin(null);
+                    if(file.getOwnerFile().equals(user))
                     user.getMyFiles().remove(file);
                     fileRepository.save(file);
                 }
@@ -164,6 +168,7 @@ public class GroupServiceImp implements GroupService {
 
 
     @Override
+    @Cacheable("caching")
     public ListUserGroupsDTOResponse getAllGroup() throws ResponseException {
         User user = search.getCurrentUser();
         List<UserGroupsDTOResponse> userDTOGroups = new ArrayList<>();
