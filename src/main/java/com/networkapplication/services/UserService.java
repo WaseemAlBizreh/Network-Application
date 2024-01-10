@@ -17,8 +17,11 @@ public interface UserService extends UserDetailsService {
 
     UsersSearchDTO getUsers() throws ResponseException;
 
-    LogDTOs getUserLogs(Long userId)throws ResponseException;
+    LogDTOs getUserLogs(Long userId) throws ResponseException;
+
     UsersSearchDTO getUsersWithFaultCount() throws ResponseException;
 
     MessageDTO UnBanUser(Long userId) throws ResponseException;
+
+    LogDTOs getUserFileLogs(Long file_id) throws ResponseException;
 }

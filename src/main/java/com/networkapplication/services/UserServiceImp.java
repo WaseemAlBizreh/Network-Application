@@ -5,8 +5,10 @@ import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.dtos.Response.UsersSearchDTO;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.Auditing;
+import com.networkapplication.models.File;
 import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
+import com.networkapplication.repositories.FileRepository;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +27,7 @@ public class UserServiceImp implements UserService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
 
+    private final FileRepository fileRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
@@ -102,12 +105,44 @@ public class UserServiceImp implements UserService {
             throw new ResponseException(403, "you are not admin");
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ResponseException(404, "User Not Found"));
-        if (user.getFaultCount()<3)
-            throw new ResponseException(404,"user is not banned");
+        if (user.getFaultCount() < 3)
+            throw new ResponseException(404, "user is not banned");
         user.setFaultCount(0);
         userRepository.save(user);
         return new MessageDTO("Account unbanned successfully");
+    }
 
+    @Override
+    public LogDTOs getUserFileLogs(Long file_id) throws ResponseException {
+        User user = utils.getCurrentUser();
+        File file = fileRepository.findById(file_id).orElseThrow(
+                () -> new ResponseException(404, "File Not Found"));
+        if (!(user.getRole().equals(Utils.role.Admin) || file.getOwnerFile().equals(user)))
+            throw new ResponseException(403,"you can not access this file report");
+        List<Auditing> Logs;
+        if (user.getLogs() == null)
+            return new LogDTOs(new ArrayList<>());
+        Logs = user.getLogs();
+        System.out.println(Logs.size());
+        for (int i=0;i<Logs.size();i++
+        ) {
+            if (!Logs.get(i).getAffectedID().equals(file_id)) {
+                Logs.remove(Logs.get(i));
+                continue;
+            }
+            if (!Logs.get(i).getResult().equals("success")) {
+                Logs.remove(Logs.get(i));
+                continue;
+            }
+
+            if (!(Logs.get(i).getOperation().equals("CreateFile")
+                    || Logs.get(i).getOperation().equals("FileCheckIn")
+                    || Logs.get(i).getOperation().equals("FileCheckOut")
+                    || Logs.get(i).getOperation().equals("FileUpdate")
+                    || Logs.get(i).getOperation().equals("FileDelete")))
+                Logs.remove(Logs.get(i));
+        }
+        return new LogDTOs(Logs);
 
     }
 

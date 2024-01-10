@@ -60,4 +60,13 @@ public class UserController {
             return exceptionHandler.handleException(ex);
         }
     }
+
+    @GetMapping("/getUserFileLogs/{file_id}")
+    public ResponseEntity<MainDTO> getUserFileLogs(@PathVariable Long file_id) {
+        try {
+            return ResponseEntity.ok(userService.getUserFileLogs(file_id));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
 }
