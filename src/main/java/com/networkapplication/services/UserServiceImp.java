@@ -124,25 +124,26 @@ public class UserServiceImp implements UserService {
             return new LogDTOs(new ArrayList<>());
         Logs = user.getLogs();
         System.out.println(Logs.size());
+        List<Auditing>re=new ArrayList<>();
         for (int i=0;i<Logs.size();i++
         ) {
             if (!Logs.get(i).getAffectedID().equals(file_id)) {
-                Logs.remove(Logs.get(i));
                 continue;
             }
             if (!Logs.get(i).getResult().equals("success")) {
-                Logs.remove(Logs.get(i));
                 continue;
             }
 
-            if (!(Logs.get(i).getOperation().equals("CreateFile")
+            if ((Logs.get(i).getOperation().equals("CreateFile")
                     || Logs.get(i).getOperation().equals("FileCheckIn")
                     || Logs.get(i).getOperation().equals("FileCheckOut")
-                    || Logs.get(i).getOperation().equals("FileUpdate")
-                    || Logs.get(i).getOperation().equals("FileDelete")))
-                Logs.remove(Logs.get(i));
+                    || Logs.get(i).getOperation().equals("FileUpdate")))
+                re.add(Logs.get(i));
         }
-        return new LogDTOs(Logs);
+        System.out.println(re.size());
+
+        System.out.println(Logs.size());
+        return new LogDTOs(re);
 
     }
 
