@@ -20,7 +20,7 @@ public class AuthServiceImp implements AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional(rollbackOn = ResponseException.class)
+
     @Override
     public UserDTOResponse login(UserDTORequest request) throws ResponseException {
         if (request.getUsername().isEmpty() || request.getPassword().isEmpty()) {

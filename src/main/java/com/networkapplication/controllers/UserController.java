@@ -9,10 +9,7 @@ import com.networkapplication.services.GroupService;
 import com.networkapplication.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -38,10 +35,27 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getUsersWithFaultCount")
+    public ResponseEntity<MainDTO> getUsersWithFaultCount() {
+        try {
+            return ResponseEntity.ok(userService.getUsersWithFaultCount());
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+
     @GetMapping("/getUserLogs/{user_id}")
     public ResponseEntity<MainDTO> getUserLogs(@PathVariable Long user_id) {
         try {
             return ResponseEntity.ok(userService.getUserLogs(user_id));
+        } catch (ResponseException ex) {
+            return exceptionHandler.handleException(ex);
+        }
+    }
+    @PostMapping("/UnbanUser/{user_id}")
+    public ResponseEntity<MainDTO> UnbanUser(@PathVariable Long user_id) {
+        try {
+            return ResponseEntity.ok(userService.UnBanUser(user_id));
         } catch (ResponseException ex) {
             return exceptionHandler.handleException(ex);
         }
