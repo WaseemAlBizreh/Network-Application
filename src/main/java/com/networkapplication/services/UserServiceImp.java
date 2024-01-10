@@ -1,6 +1,7 @@
 package com.networkapplication.services;
 
 import com.networkapplication.dtos.Request.LogDTOs;
+import com.networkapplication.dtos.Response.MessageDTO;
 import com.networkapplication.dtos.Response.UsersSearchDTO;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.models.Auditing;
@@ -8,6 +9,7 @@ import com.networkapplication.models.Group;
 import com.networkapplication.models.User;
 import com.networkapplication.repositories.GroupRepository;
 import com.networkapplication.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -51,13 +53,13 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UsersSearchDTO getUsers() throws ResponseException {
-        User admin=utils.getCurrentUser();
+        User admin = utils.getCurrentUser();
         if (admin.getRole().equals(Utils.role.User))
-            throw new ResponseException(403,"you are not admin");
+            throw new ResponseException(403, "you are not admin");
         List<User> users = userRepository.findAll();
-        List<User> notAdmins=new ArrayList<>();
-        for (User user:users
-             ) {
+        List<User> notAdmins = new ArrayList<>();
+        for (User user : users
+        ) {
             if (user.getRole().equals(Utils.role.User))
                 notAdmins.add(user);
         }
@@ -68,19 +70,47 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public LogDTOs getUserLogs(Long userId)throws ResponseException{
-        User admin=utils.getCurrentUser();
+    public LogDTOs getUserLogs(Long userId) throws ResponseException {
+        User admin = utils.getCurrentUser();
         if (admin.getRole().equals(Utils.role.User))
-            throw new ResponseException(403,"you are not admin");
-        User user=userRepository.findById(userId).orElseThrow(
+            throw new ResponseException(403, "you are not admin");
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new ResponseException(404, "User Not Found"));
-        List < Auditing > Logs;
-        if (user.getLogs()!=null)
-                 Logs=user.getLogs();
-        else Logs=List.of();
+        List<Auditing> Logs;
+        if (user.getLogs() != null)
+            Logs = user.getLogs();
+        else Logs = List.of();
         return new LogDTOs(Logs);
 
     }
+
+    @Override
+    public UsersSearchDTO getUsersWithFaultCount() throws ResponseException {
+        User admin = utils.getCurrentUser();
+        if (admin.getRole().equals(Utils.role.User))
+            throw new ResponseException(403, "you are not admin");
+        UsersSearchDTO usersSearchDTO = new UsersSearchDTO();
+        usersSearchDTO.setUsers(userRepository.findByFaultCountGreaterThanEqual(3));
+        return usersSearchDTO;
+    }
+
+    @Transactional(rollbackOn = ResponseException.class)
+    @Override
+    public MessageDTO UnBanUser(Long userId) throws ResponseException {
+        User admin = utils.getCurrentUser();
+        if (admin.getRole().equals(Utils.role.User))
+            throw new ResponseException(403, "you are not admin");
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ResponseException(404, "User Not Found"));
+        if (user.getFaultCount()<3)
+            throw new ResponseException(404,"user is not banned");
+        user.setFaultCount(0);
+        userRepository.save(user);
+        return new MessageDTO("Account unbanned successfully");
+
+
+    }
+
 }
 
 
