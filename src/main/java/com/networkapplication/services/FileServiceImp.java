@@ -47,7 +47,9 @@ public class FileServiceImp implements FileService {
     @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO deleteAllFilesInGroup(Long group_id) throws ResponseException {
-
+        if (group_id == null) {
+            throw new ResponseException(422, "group id is Empty");
+        }
         User user = utils.getCurrentUser();
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "No Group Found")
@@ -63,6 +65,9 @@ public class FileServiceImp implements FileService {
 
     @Override
     public ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException {
+        if (groupId == null) {
+            throw new ResponseException(422, "group id is Empty");
+        }
         User user = utils.getCurrentUser();
         boolean status = false;
         Group group = groupRepository.findById(groupId).orElseThrow(
@@ -89,6 +94,9 @@ public class FileServiceImp implements FileService {
     @Transactional(rollbackOn = ResponseException.class)
     @Override
     public CreateFileDTOResponse createFile(MultipartFile file, Long group_id) throws IOException, ResponseException {
+        if(file.isEmpty() || group_id == null){
+            throw new ResponseException(422, "groupId or file is Empty");
+        }
         User user = utils.getCurrentUser();
         Group group = groupRepository.findById(group_id).orElseThrow(
                 () -> new ResponseException(404, "Group notFound")
@@ -131,7 +139,9 @@ public class FileServiceImp implements FileService {
 
     @Override
     public ResponseEntity<Resource> getFile(Long group_id, FileName file_name) throws ResponseException {
-
+        if (group_id == null || file_name.getName().isEmpty()) {
+            throw new ResponseException(422, "groupId or fileName is Empty");
+        }
         java.io.File folder = new java.io.File(System.getProperty("user.home") + "/Desktop\\Network-Project\\group" + group_id);
         User user = utils.getCurrentUser();
         Group group = groupRepository.findById(group_id).orElseThrow(
@@ -164,6 +174,9 @@ public class FileServiceImp implements FileService {
 
     @Override
     public MessageDTO updateFile(MultipartFile file1, Long group_id) throws ResponseException, IOException {
+        if (group_id == null || file1.isEmpty()) {
+            throw new ResponseException(422, "file or groupId is Empty");
+        }
         java.io.File folder = new java.io.File(System.getProperty("user.home") + "/Desktop\\Network-Project" + "\\group" + group_id);
         java.io.File[] listOfFiles = folder.listFiles();
         assert listOfFiles != null;
@@ -203,6 +216,9 @@ public class FileServiceImp implements FileService {
     @Override
     @Transactional(rollbackOn = ResponseException.class)
     public MessageDTO checkIn(CheckInDTO checkIn) throws ResponseException {
+        if (checkIn.getFile_id().isEmpty()) {
+            throw new ResponseException(422, "files is Empty");
+        }
         List<Long> check = new ArrayList<Long>();
         User user = utils.getCurrentUser();
         if (checkIn.getFile_id() == null) {
@@ -237,7 +253,7 @@ public class FileServiceImp implements FileService {
                         }, new Date(System.currentTimeMillis() + delayInMillis));
                     }
                 } else {
-                    throw new ResponseException(404,"you are not found in group");
+                    throw new ResponseException(404, "you are not found in group");
                 }
             }
         }
@@ -263,6 +279,9 @@ public class FileServiceImp implements FileService {
     @Transactional(rollbackOn = ResponseException.class)
     @Override
     public MessageDTO checkOut(CheckInDTO checkOut) throws ResponseException {
+        if (checkOut.getFile_id().isEmpty()) {
+            throw new ResponseException(422, "file ids is Empty");
+        }
         User user = utils.getCurrentUser();
         if (checkOut.getFile_id() == null) {
             checkOut.setFile_id(List.of());
@@ -293,6 +312,9 @@ public class FileServiceImp implements FileService {
     public MessageDTO deleteFile(Long groupId, CheckInDTO filesId) throws ResponseException {
 //      get user or admin
 //      TODO:check and fix
+        if (filesId.getFile_id().isEmpty() || groupId == null) {
+            throw new ResponseException(422, "file ids is Empty");
+        }
         User user = utils.getCurrentUser();
         Group group = groupRepository.findById(groupId).orElseThrow(
                 () -> new ResponseException(404, "Not Found Group")
@@ -311,7 +333,7 @@ public class FileServiceImp implements FileService {
                 }
             }
         } else {
-            throw new ResponseException(403,"You are not in the group");
+            throw new ResponseException(403, "You are not in the group");
         }
         return MessageDTO.builder().message("Files Deleted Successfully").build();
     }

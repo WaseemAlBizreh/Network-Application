@@ -20,9 +20,10 @@ public class AuthServiceImp implements AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public UserDTOResponse login(UserDTORequest request) throws ResponseException {
-        if(request.getUsername().isEmpty() || request.getPassword().isEmpty()){
+        if (request.getUsername().isEmpty() || request.getPassword().isEmpty()) {
             throw new ResponseException(422,
                     "username or password is Empty");
         }
@@ -45,10 +46,10 @@ public class AuthServiceImp implements AuthService {
         return response;
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public UserDTOResponse register(UserDTORequest userRequest) throws ResponseException {
-        if(userRequest.getUsername().isEmpty() || userRequest.getPassword().isEmpty()){
+        if (userRequest.getUsername().isEmpty() || userRequest.getPassword().isEmpty()) {
             throw new ResponseException(422,
                     "username or password is Empty");
         }
@@ -72,10 +73,10 @@ public class AuthServiceImp implements AuthService {
         return response;
     }
 
-    @Transactional
+    @Transactional(rollbackOn = ResponseException.class)
     @Override
     public UserDTOResponse adminRegister(AdminRegisterDTO adminRequest) throws ResponseException {
-        if(adminRequest.getUsername().isEmpty() || adminRequest.getPassword().isEmpty()){
+        if (adminRequest.getUsername().isEmpty() || adminRequest.getPassword().isEmpty()) {
             throw new ResponseException(422,
                     "username or password is Empty");
         }
