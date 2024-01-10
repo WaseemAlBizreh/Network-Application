@@ -32,6 +32,8 @@ public class GroupServiceImp implements GroupService {
     @Transactional(rollbackOn = ResponseException.class)
     @Override
     public GroupDTOResponse addGroup(GroupDTORequest request) throws ResponseException {
+        if(request.getGroupName().isEmpty())
+            throw new ResponseException(422,"Group Name is Empty");
         User user = search.getCurrentUser();
         for (Group group : user.getUserGroups()
         ) {

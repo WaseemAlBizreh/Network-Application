@@ -38,8 +38,8 @@ public class UserDTO implements MainDTO {
             }
         if (user.getFiles() != null)
             for (int i = 0; i < user.getFiles().size(); i++) {
-                Long group_id=user.getMyFiles().get(i).getGroupFiles().getId();
-                files.add(user.getFiles().get(i).getFileName().substring(0,user.getMyFiles().get(i).getFileName().length()-group_id.toString().length()));
+                Long group_id=user.getFiles().get(i).getGroupFiles().getId();
+                files.add(user.getFiles().get(i).getFileName().substring(0,user.getFiles().get(i).getFileName().length()-group_id.toString().length()));
             }
         if (user.getMyFiles() != null)
             for (int i = 0; i < user.getMyFiles().size(); i++) {

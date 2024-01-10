@@ -65,7 +65,6 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    @Cacheable(value = "files", key = "#group_id + #file_name")
     public ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException {
         if (groupId == null) {
             throw new ResponseException(422, "group id is Empty");
