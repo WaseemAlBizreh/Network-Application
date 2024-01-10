@@ -22,13 +22,17 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public UserDTOResponse login(UserDTORequest request) throws ResponseException {
-
+        if(request.getUsername().isEmpty() || request.getPassword().isEmpty()){
+            throw new ResponseException(422,
+                    "username or password is Empty");
+        }
         User user = userRepository.findUserByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseException(404, "User Not Found"));
-            if (user.getFaultCount()>=3)
-                throw new ResponseException(403,"your account is blocked");
+        if (user.getFaultCount() >= 3)
+            throw new ResponseException(403, "your account is blocked");
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            user.setFaultCount(user.getFaultCount()+1);
+            user.setFaultCount(user.getFaultCount() + 1);
             userRepository.save(user);
             throw new ResponseException(422, "Wrong Password");
         }
@@ -44,6 +48,10 @@ public class AuthServiceImp implements AuthService {
     @Transactional
     @Override
     public UserDTOResponse register(UserDTORequest userRequest) throws ResponseException {
+        if(userRequest.getUsername().isEmpty() || userRequest.getPassword().isEmpty()){
+            throw new ResponseException(422,
+                    "username or password is Empty");
+        }
         if (userRepository.findUserByUsername(userRequest.getUsername()).isPresent())
             throw new ResponseException(400,
                     "username is already taken");
@@ -67,6 +75,10 @@ public class AuthServiceImp implements AuthService {
     @Transactional
     @Override
     public UserDTOResponse adminRegister(AdminRegisterDTO adminRequest) throws ResponseException {
+        if(adminRequest.getUsername().isEmpty() || adminRequest.getPassword().isEmpty()){
+            throw new ResponseException(422,
+                    "username or password is Empty");
+        }
         if (userRepository.findUserByUsername(adminRequest.getUsername()).isPresent())
             throw new ResponseException(400,
                     "username is already taken");
@@ -74,7 +86,7 @@ public class AuthServiceImp implements AuthService {
             throw new ResponseException(422,
                     "Password and Confirm Password Don't Match");
         }
-        if (!adminRequest.getVerificationCode().equals("SHADOWEN")){
+        if (!adminRequest.getVerificationCode().equals("SHADOWEN")) {
             throw new ResponseException(422,
                     "verification code is incorrect");
 
