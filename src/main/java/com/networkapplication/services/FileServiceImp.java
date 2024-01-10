@@ -17,6 +17,7 @@ import com.networkapplication.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -64,6 +65,7 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
+    @Cacheable(value = "files", key = "#group_id + #file_name")
     public ListGroupFilesDTO loadAllGroupFiles(Long groupId) throws ResponseException {
         if (groupId == null) {
             throw new ResponseException(422, "group id is Empty");
@@ -78,11 +80,12 @@ public class FileServiceImp implements FileService {
             for (File file :
                     group.getFile()) {
                 if (file.getCheckin() != null) {
-                    if (Objects.equals(user.getId(), file.getCheckin().getId()))
-                        status = true;
-                } else
+                    status = Objects.equals(user.getId(), file.getCheckin().getId());
+                } else {
                     status = false;
-                filesDTOGroupResponses.add(new GroupFilesDTOResponse(file, status));
+                }
+
+                filesDTOGroupResponses.add(new GroupFilesDTOResponse(file, status,groupId));
             }
             listGroupFilesDTO.setGroupFilesDTOResponses(filesDTOGroupResponses);
             return listGroupFilesDTO;
@@ -259,17 +262,28 @@ public class FileServiceImp implements FileService {
         }
         if (check.size() != 0) {
             StringBuilder stringBuilder = new StringBuilder();
-
             if (check.size() == 1) {
+                File file=fileRepository.findById(check.get(0)).get();
+                Long id =file.getGroupFiles().getId();
+                String name=fileRepository.findById(check.get(0)).get().getFileName();
+                String a=name.substring(0,name.length()-id.toString().length());
                 stringBuilder.append("File ");
-                stringBuilder.append(fileRepository.findById(check.get(0)).get().getFileName()).append(" is CheckIn");
+                stringBuilder.append(a).append(" is CheckIn");
             } else {
+
                 stringBuilder.append("Files ");
                 for (int j = 0; j < check.size() - 1; j++) {
-                    String name = fileRepository.findById(check.get(j)).get().getFileName();
-                    stringBuilder.append(name).append(" and ");
+                    File file=fileRepository.findById(check.get(j)).get();
+                    Long id =file.getGroupFiles().getId();
+                    String name=fileRepository.findById(check.get(j)).get().getFileName();
+                    String a=name.substring(0,name.length()-id.toString().length());
+                    stringBuilder.append(a).append(" and ");
                 }
-                stringBuilder.append(fileRepository.findById(check.get(check.size() - 1)).get().getFileName()).append(" is CheckIn");
+                File file=fileRepository.findById(check.get(check.size()-1)).get();
+                Long id =file.getGroupFiles().getId();
+                String name=fileRepository.findById(check.get(check.size()-1)).get().getFileName();
+                String a=name.substring(0,name.length()-id.toString().length());
+                stringBuilder.append(a).append(" is CheckIn");
             }
             throw new ResponseException(403, stringBuilder.toString());
         } else

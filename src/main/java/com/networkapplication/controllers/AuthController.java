@@ -6,6 +6,7 @@ import com.networkapplication.dtos.Request.UserDTORequest;
 import com.networkapplication.exceptions.GlobalExceptionHandler;
 import com.networkapplication.exceptions.ResponseException;
 import com.networkapplication.services.AuthService;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,12 +14,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService services;
     private final GlobalExceptionHandler exceptionHandler;
+    private final List<UserDTORequest> batchedRequests= new ArrayList<>();
 
     @PostMapping("/login")
     public ResponseEntity<MainDTO> login(@RequestBody UserDTORequest user) {
@@ -38,6 +43,7 @@ public class AuthController {
         }
     }
 
+
     @PostMapping("/registerAsAdmin")
     public ResponseEntity<MainDTO> registerAsAdmin(@RequestBody AdminRegisterDTO admin) {
         try {
@@ -47,21 +53,8 @@ public class AuthController {
         }
     }
 
-//    @PostMapping("/log")
-//    public ResponseEntity<MainDTO>regis(@RequestBody UserDTORequest user) throws ResponseException {
-//        for (int i = 0; i < 4000; i++) {
-//            user.setUsername(user.getUsername()+i);
-//           services.register(user);
-//        }
-//        return null;
-//    }
 
 
 }
-
-//    @DeleteMapping("/logout")
-//    public ResponseEntity<MessageDTO> logout(@RequestHeader String token) {
-//        return ResponseEntity.ok(services.logout(token));
-//    }
 
 

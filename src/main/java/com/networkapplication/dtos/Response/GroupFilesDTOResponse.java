@@ -15,9 +15,9 @@ public class GroupFilesDTOResponse {
     private String fileName;
     private boolean status;
 
-    public GroupFilesDTOResponse(File file,boolean status) {
+    public GroupFilesDTOResponse(File file,boolean status,Long group_id) {
         fileId = file.getId();
-        fileName = file.getFileName();
+        fileName = file.getFileName().substring(0,file.getFileName().length()-group_id.toString().length());
         this.status=status;
     }
 }
